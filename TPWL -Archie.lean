@@ -8,6 +8,7 @@ def linear_function_prop (K V : Type _) [Field K] [AddCommGroup V] [Module K V] 
   ∀ (x y : V) (a b : K), F (a • x + b • y) = a * (F x) + b * (F y)
 -- Note that "V" is our vector space here
 
+
 --PROBLEM
 -- Now define the linear functional Fy induced by a vector y in Hilbert space H.
 --variable {K H: Type _}[RCLike K][InnerProductSpace K H]{y : H}

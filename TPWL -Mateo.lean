@@ -4,6 +4,8 @@ import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 
+--
+
 --Useful Theorems:
 --Module.finBasisOfFinrankEq (generates a basis from a module of finite rank)
 --Module.finite_of_finrank_eq_succ (Tells us that modules of natural number

@@ -18,6 +18,11 @@ variable {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 --The dimension of a vector space is given using the function Module.finrank
 --An extremely useful theorem is hidden at Module.finBasisOfFinrankEq
 --There is also an arguably more useful theorem below it
+
+
+-- This theorem in plain english, given a 1 dimensional vector space, there
+-- exists a vector u in the Vector space such that every v in the vector space
+-- can be expressed as ku for some scalar k
 theorem Unidim_Vect_Space(h : Module.finrank K V = 1): ∃ u : V, ∀ v: V ,
     ∃ k : K, v = k • u := by
 
@@ -30,11 +35,23 @@ have h2 : Module.Finite K V := by
 
 
 -- This line generates a basis (b) which is indexed by Fin 1
--- We needed to do the last part since we required
 -- Fin 1 is {0} the set containing 0
 let b := Module.finBasisOfFinrankEq K V h
+
+-- this states we will use the first (and only) element in our basis b
+-- as our "u"
 use b 0
+-- This next line is effectively saying "take an arbitrary v"
 intro v
+-- This next line is saying use the scalar in the first (and only) term
+-- in the basis
+use b.repr v 0
+-- This next line replaces v with its expansion in the basis, so on
+-- the right of the equation we have its expansion in the basis
+-- and on the left of the equation we also have its expansion in the
+--basis, therefore the only thing we have to do is simplify
+rw [← b.sum_repr v]
+simp
 
 
 -- theorem Unidim_Vect_Space(h2 : Module.Finite K V)(h : Module.finrank K V = 1): ∃ u : V, ∀ v: V ,

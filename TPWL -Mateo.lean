@@ -1,7 +1,6 @@
 import TPWLFinalProject.Basic
 import Mathlib.Tactic.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank
-import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 
 --
@@ -45,8 +44,9 @@ let b := Module.finBasisOfFinrankEq K V h
 use b 0
 -- This next line is effectively saying "take an arbitrary v"
 intro v
--- This next line is saying use the scalar in the first (and only) term
--- in the basis
+-- This next line is saying that we take our "k" to be the
+-- coefficient of vector v (at index 0) as the scalar k that
+-- we are looking for.
 use b.repr v 0
 -- This next line replaces v with its expansion in the basis, so on
 -- the right of the equation we have its expansion in the basis
@@ -55,21 +55,10 @@ use b.repr v 0
 rw [← b.sum_repr v]
 simp
 
-
--- theorem Unidim_Vect_Space(h2 : Module.Finite K V)(h : Module.finrank K V = 1): ∃ u : V, ∀ v: V ,
---     ∃ k : K, v = k • u := by
--- -- The first line generates a basis (b) which is indexed by Fin 1
--- -- Fin 1 is {0} the set containing 0
--- let b := Module.finBasisOfFinrankEq K V h
-
-
-
--- We then need to show that all vectors in U
--- ⊥ are of the form cu where c ∈ K, u ∈ U
--- ⊥ This follows from the fact that U
--- ⊥
--- is 1-dimensional.
-
-
--- We then need to show that U
--- ⊥ has dimension 1. This part will be quite difficult
+-- The second theorem I have to formalise
+-- I will actually try to prove the more general statement
+-- For any vector space V and non-zero functional f, the
+-- dimension of the quotient space V / ker(f) is 1.
+theorem Functional_Coker_Dim (f: V →ₗ[K] K)(hf : f ≠ 0):
+    Module.finrank K (V ⧸ LinearMap.ker f) = 1 := by
+    sorry

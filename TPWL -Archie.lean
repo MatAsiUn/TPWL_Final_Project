@@ -30,3 +30,18 @@ lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G x 
 -- We can use exact as G x = 0, is what is left to prove but this was one of
 -- assumptions
  exact h
+
+
+-- Introduce Hilber Space variable (and add strong dual to make life easier)
+variable[CompleteSpace E](G: StrongDual ℂ E)
+
+def kernel_of_G : Set E := { x : E | G x = 0 }
+
+-- Prove that it is closed
+lemma kernel_of_G_is_closed : IsClosed (kernel_of_G G) := by
+ -- G is continuous as it is in the dual
+ have hG : Continuous G := G.continuous
+
+ -- {0} is closed as it is a singleton set
+ have h0 : IsClosed ({0} : Set ℂ) := isClosed_singleton
+ --exact?

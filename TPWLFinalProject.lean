@@ -28,8 +28,8 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G x = 0):
  G x = ⟪x,0⟫ := by
  -- We use a lemma found in IPS.Basic, that tells us the inner
- -- product of anything with 0 is 0
- simp only [inner_zero_right]
+ -- product of anything with 0 on the right is 0
+ simp [inner_zero_right]
 
 -- We can use exact as G x = 0, is what is left to prove but this was one of
 -- assumptions

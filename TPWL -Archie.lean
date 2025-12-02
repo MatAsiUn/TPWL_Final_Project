@@ -25,7 +25,7 @@ lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G x 
  G x = ⟪x,0⟫ := by
  -- We use a lemma found in InnerProductSpace.Basic, that tells us the inner
  -- product of anything with 0 is 0
- simp only [inner_zero_right]
+ simp [inner_zero_right]
 
 -- We can use exact as G x = 0, is what is left to prove but this was one of
 -- assumptions

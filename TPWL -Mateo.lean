@@ -2,6 +2,9 @@ import TPWLFinalProject.Basic
 import Mathlib.Tactic.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+-- ^^ used for Submodule.length_lt
+
 
 --
 
@@ -38,20 +41,9 @@ have h2 : Module.Finite K V := by
 -- This line generates a basis (b) which is indexed by Fin 1
 -- Fin 1 is {0} the set containing 0
 let b := Module.finBasisOfFinrankEq K V h
-
--- this states we will use the first (and only) element in our basis b
--- as our "u"
 use b 0
--- This next line is effectively saying "take an arbitrary v"
 intro v
--- This next line is saying that we take our "k" to be the
--- coefficient of vector v (at index 0) as the scalar k that
--- we are looking for.
 use b.repr v 0
--- This next line replaces v with its expansion in the basis, so on
--- the right of the equation we have its expansion in the basis
--- and on the left of the equation we also have its expansion in the
---basis, therefore the only thing we have to do is simplify
 rw [← b.sum_repr v]
 simp
 
@@ -61,4 +53,19 @@ simp
 -- dimension of the quotient space V / ker(f) is 1.
 theorem Functional_Coker_Dim (f: V →ₗ[K] K)(hf : f ≠ 0):
     Module.finrank K (V ⧸ LinearMap.ker f) = 1 := by
-    sorry
+    have Iso := f.quotKerEquivRange -- by the first iso thm
+    rw[LinearEquiv.finrank_eq Iso]
+    -- showing that the dimension of the range of f is less than the dimension of K
+    -- by virtue of being a submodule
+    have h_le : Module.finrank K (LinearMap.range f) ≤ Module.finrank K K :=
+    by exact Submodule.finrank_le (LinearMap.range f)
+    rw[Module.finrank_self K] at h_le
+    apply le_antisymm h_le
+    rw [Nat.succ_le_iff]
+    rw [Module.finrank_pos_iff_exists_ne_zero]
+    refine Submodule.nonzero_mem_of_bot_lt ?_ --This idea was given thanks to apply?
+    -- The upside down T is just the "bottom" subspace, in other words the zero subspace
+    rw [bot_lt_iff_ne_bot]
+    rw[ne_eq]
+    rw [LinearMap.range_eq_bot] --an amazing lemma
+    exact hf

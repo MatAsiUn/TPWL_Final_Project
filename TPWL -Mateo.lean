@@ -2,9 +2,12 @@ import TPWLFinalProject.Basic
 import Mathlib.Tactic.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 -- ^^ used for Submodule.length_lt
-
+-- All libraries below are for the proofs beyond my section
+import Mathlib.Analysis.InnerProductSpace.Defs
+import Mathlib.Analysis.Normed.Module.Basic
+import Mathlib.Analysis.InnerProductSpace.Basic
 
 --
 
@@ -69,3 +72,35 @@ theorem Functional_Coker_Dim (f: V →ₗ[K] K)(hf : f ≠ 0):
     rw[ne_eq]
     rw [LinearMap.range_eq_bot] --an amazing lemma
     exact hf
+
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+-- This is me working on the project after finishing what I had set out to do
+
+open scoped ComplexInnerProductSpace
+lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G = 0):
+ G x = ⟪x,0⟫ := by
+ -- We use a lemma found in IPS.Basic, that tells us the inner
+ -- product of anything with 0 on the right is 0
+ simp [inner_zero_right]
+ rw[h]
+ simp
+
+
+
+theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
+ ∃ v : E, ∀ x : E, G x = ⟪x,v⟫ := by
+ by_cases hG : G = 0
+ {
+    use 0
+    intro x
+    exact Riesz_Representation_Theorem_TrivialG G hG
+ }
+ {
+    change G ≠ 0 at hG
+    sorry
+ }
+
+ theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
+ ∃! v : E, ∀ x : E, G x = ⟪x,v⟫ := by
+ sorry
+ --We first start with the trivial case (where G is the zero element in the dual)

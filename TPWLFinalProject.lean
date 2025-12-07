@@ -1,13 +1,11 @@
 import TPWLFinalProject.Basic
 import Mathlib.Tactic.Basic
-import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 import Mathlib.Analysis.InnerProductSpace.Defs
-import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.Normed.Module.Basic
-import Mathlib.Analysis.Normed.Module.Dual
-import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.InnerProductSpace.Basic
 
 
 set_option linter.style.commandStart false
@@ -25,21 +23,34 @@ open scoped ComplexInnerProductSpace
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 
  -- The statment of Riesz Representation Theorem for a trivial G (G identically 0)
-lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G x = 0):
+
+lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G = 0):
  G x = ⟪x,0⟫ := by
  -- We use a lemma found in IPS.Basic, that tells us the inner
  -- product of anything with 0 on the right is 0
  simp [inner_zero_right]
-
--- We can use exact as G x = 0, is what is left to prove but this was one of
--- assumptions
- exact h
+ rw[h]
+ simp
 
 -- Section for Hilbert Spaces
 section hilbert_space_theorems
 
 -- We add the completeness assumption
 variable [CompleteSpace E]
+
+--We first start by proving Existence
+theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
+ ∃ v : E, ∀ x : E, G x = ⟪x,v⟫ := by
+ by_cases hG : G = 0
+ {
+    use 0
+    intro x
+    exact Riesz_Representation_Theorem_TrivialG G hG
+ }
+ {
+    sorry
+ }
+
 
 theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
  ∃! v : E, ∀ x : E, G x = ⟪x,v⟫ := by

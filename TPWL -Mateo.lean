@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 import Mathlib.Analysis.InnerProductSpace.Defs
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
+import Mathlib.Analysis.InnerProductSpace.Projection --Needed for statement of theorem
+--Quotient_Iso_Perp
 
 --
 
@@ -73,6 +75,8 @@ theorem Functional_Coker_Dim (f: V →ₗ[K] K)(hf : f ≠ 0):
     rw [LinearMap.range_eq_bot] --an amazing lemma
     exact hf
 
+
+
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 -- This is me working on the project after finishing what I had set out to do
 
@@ -85,6 +89,20 @@ lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G = 
  rw[h]
  simp
 
+variable [CompleteSpace E]
+
+--for some reason we had to use noncomputable def instead of theorem
+noncomputable def Quotient_Iso_Perp(U: Submodule ℂ E)(hU: IsClosed (U : Set E)):
+    (E ⧸ U) ≃ₗ[ℂ] Uᗮ := by
+    have h_complete : CompleteSpace U := by sorry
+    have h_orth : U.HasOrthogonalProjection :=
+    by exact Submodule.HasOrthogonalProjection.ofCompleteSpace U
+    have h_compl : IsCompl U Uᗮ :=
+    by exact Submodule.isCompl_orthogonal_of_hasOrthogonalProjection
+    exact Submodule.quotientEquivOfIsCompl U Uᗮ h_compl
+
+
+    -- have hcompl : IsCompl U Uᗮ := Submodule.isCompl_orthogonal_of_hasOrthogonalProjection
 
 
 theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
@@ -96,7 +114,17 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     exact Riesz_Representation_Theorem_TrivialG G hG
  }
  {
-    change G ≠ 0 at hG
+    have hG_lin : (G : E →ₗ[ℂ] ℂ) ≠ 0 := by norm_cast --this step is necessary
+    -- since our proof hCoker_Rank required the hypothesis that G was a linear map
+    -- but we had that G was a continuous linear map (as all members of strong dual are)
+    -- We can now use our lemma from before to show that the dimension of the cokernel
+    -- must be 1
+    have hCoker_Rank : Module.finrank ℂ (E ⧸ LinearMap.ker G) = 1 :=
+    by exact Functional_Coker_Dim G.toLinearMap hG_lin
+    --We now have that E/ker(G) has dimension 1. It is left to prove that E/ker(G) is
+    --Isomorphic to ker(G)⟂
+    -- It is proven in Quotient_Iso_Perp, it just needs to be applied to this section
+    -- We also need a proof that ker(G) is closed.
     sorry
  }
 

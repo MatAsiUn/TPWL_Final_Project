@@ -10,6 +10,7 @@ import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection --Needed for statement of theorem
 --Quotient_Iso_Perp
+import Mathlib.Topology.Algebra.Module.Basic
 
 --
 
@@ -92,13 +93,24 @@ lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G = 
 variable [CompleteSpace E]
 
 --for some reason we had to use noncomputable def instead of theorem
+--proving this theorem was tough, and used a lot of weird lemmas
 noncomputable def Quotient_Iso_Perp(U: Submodule ℂ E)(hU: IsClosed (U : Set E)):
     (E ⧸ U) ≃ₗ[ℂ] Uᗮ := by
-    have h_complete : CompleteSpace U := by sorry
+    --We have that U is its own closure since U is closed
+    have h_closure : U.topologicalClosure = U :=
+    by exact IsClosed.submodule_topologicalClosure_eq hU
+    --Since U is a topological closure it is complete (there should be a way of doing
+    --it directly from definition of closed without needing topological closure)
+    have h_complete : CompleteSpace U :=
+    by rw [← h_closure]; exact Submodule.topologicalClosure.completeSpace U
+    -- Since U is complete it has an orthogonal projection
     have h_orth : U.HasOrthogonalProjection :=
     by exact Submodule.HasOrthogonalProjection.ofCompleteSpace U
+    -- We have that U and U⟂ are complementary in E (U ⊕ U⟂ = V)
     have h_compl : IsCompl U Uᗮ :=
     by exact Submodule.isCompl_orthogonal_of_hasOrthogonalProjection
+    -- And then we have a fantastic lemma that tells us that if q is a complement of
+    -- p then E/p is isomorphic to q
     exact Submodule.quotientEquivOfIsCompl U Uᗮ h_compl
 
 
@@ -114,6 +126,8 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     exact Riesz_Representation_Theorem_TrivialG G hG
  }
  {
+    -- By definition we get that LinearMap.ker G is a submodule
+    have KerGClosed: IsClosed (LinearMap.ker G : Set E) := sorry
     have hG_lin : (G : E →ₗ[ℂ] ℂ) ≠ 0 := by norm_cast --this step is necessary
     -- since our proof hCoker_Rank required the hypothesis that G was a linear map
     -- but we had that G was a continuous linear map (as all members of strong dual are)
@@ -121,10 +135,16 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     -- must be 1
     have hCoker_Rank : Module.finrank ℂ (E ⧸ LinearMap.ker G) = 1 :=
     by exact Functional_Coker_Dim G.toLinearMap hG_lin
+    have Iso : (E ⧸ LinearMap.ker G) ≃ₗ[ℂ] (LinearMap.ker G)ᗮ :=
+    by exact Quotient_Iso_Perp (LinearMap.ker G) KerGClosed
+    have hPerp_Rank : Module.finrank ℂ (LinearMap.ker G)ᗮ = 1 :=
+    by rw[LinearEquiv.finrank_eq Iso.symm]; exact hCoker_Rank
+
     --We now have that E/ker(G) has dimension 1. It is left to prove that E/ker(G) is
     --Isomorphic to ker(G)⟂
     -- It is proven in Quotient_Iso_Perp, it just needs to be applied to this section
     -- We also need a proof that ker(G) is closed.
+
     sorry
  }
 

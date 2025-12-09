@@ -111,6 +111,7 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
  {
     -- By definition we get that LinearMap.ker G is a submodule
     -- So we must only prove that it is closed
+    -- *THIS* is where Archie works his magic
     have KerGClosed: IsClosed (LinearMap.ker G : Set E) := sorry
     have hG_lin : (G : E →ₗ[ℂ] ℂ) ≠ 0 := by norm_cast --this step is necessary
     -- since our proof hCoker_Rank required the hypothesis that G was a linear map
@@ -137,5 +138,5 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
 theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
  ∃! v : E, ∀ x : E, G x = ⟪x,v⟫ := by
  sorry
-
+-- refine ExistsUnique.intro ?_ ?_ ?_
 end hilbert_space_theorems

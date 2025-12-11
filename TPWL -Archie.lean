@@ -16,7 +16,6 @@ def linear_function_prop (K V : Type _) [Field K] [AddCommGroup V] [Module K V] 
   ∀ (x y : V) (a b : K), F (a • x + b • y) = a * (F x) + b * (F y)
 -- Note that "V" is our vector space here
 
--- We want to prove Riesz for a
 open scoped ComplexInnerProductSpace
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 
@@ -31,17 +30,22 @@ lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G x 
 -- assumptions
  exact h
 
+lemma KerGClosed (G: StrongDual ℂ E): IsClosed (LinearMap.ker G : Set E) := by
+ exact ContinuousLinearMap.isClosed_ker G
 
 -- Introduce Hilber Space variable (and add strong dual to make life easier)
-variable[CompleteSpace E](G: StrongDual ℂ E)
+variable[CompleteSpace E]
 
-def kernel_of_G : Set E := { x : E | G x = 0 }
+--def kernel_of_G : Set E := { x : E | G x = 0 }
 
 -- Prove that it is closed
-lemma kernel_of_G_is_closed : IsClosed (kernel_of_G G) := by
+-- lemma kernel_of_G_is_closed : IsClosed (kernel_of_G G) := by
  -- G is continuous as it is in the dual
- have hG : Continuous G := G.continuous
+ --have hG : Continuous G := G.continuous
 
  -- {0} is closed as it is a singleton set
- have h0 : IsClosed ({0} : Set ℂ) := isClosed_singleton
+ --have h0 : IsClosed ({0} : Set ℂ) := isClosed_singleton
  --exact?
+ --sorry
+
+ -- Cauchy-Schwartz

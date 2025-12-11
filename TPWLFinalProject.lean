@@ -111,8 +111,8 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
  {
     -- By definition we get that LinearMap.ker G is a submodule
     -- So we must only prove that it is closed
-    -- *THIS* is where Archie works his magic
-    have KerGClosed: IsClosed (LinearMap.ker G : Set E) := sorry
+    have KerGClosed: IsClosed (LinearMap.ker G : Set E) := by
+     ContinuousLinearMap.isClosed_ker G
     have hG_lin : (G : E →ₗ[ℂ] ℂ) ≠ 0 := by norm_cast --this step is necessary
     -- since our proof hCoker_Rank required the hypothesis that G was a linear map
     -- but we had that G was a continuous linear map (as all members of strong dual are)
@@ -130,7 +130,6 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     --We now have that E/ker(G) has dimension 1. It is left to prove that E/ker(G) is
     --Isomorphic to ker(G)⟂
     -- It is proven in Quotient_Iso_Perp, it just needs to be applied to this section
-    -- We also need a proof that ker(G) is closed.
 
     sorry
  }

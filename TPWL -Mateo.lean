@@ -152,3 +152,5 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
  ∃! v : E, ∀ x : E, G x = ⟪x,v⟫ := by
  sorry
  --We first start with the trivial case (where G is the zero element in the dual)
+
+-- refine ExistsUnique.intro ?_ ?_ ?_

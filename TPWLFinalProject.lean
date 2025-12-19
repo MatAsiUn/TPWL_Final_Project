@@ -9,6 +9,7 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Submodule --Needed for statement of theorem
 --Quotient_Iso_Perp
+import Mathlib.Topology.Algebra.Module.LinearMap --Needed for ContinuousLinearMap.isClosed_ker
 
 set_option linter.style.commandStart false
 
@@ -111,8 +112,8 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
  {
     -- By definition we get that LinearMap.ker G is a submodule
     -- So we must only prove that it is closed
-    have KerGClosed: IsClosed (LinearMap.ker G : Set E) := by
-     ContinuousLinearMap.isClosed_ker G
+    have KerGClosed: IsClosed (LinearMap.ker G : Set E) :=
+    by exact ContinuousLinearMap.isClosed_ker G
     have hG_lin : (G : E →ₗ[ℂ] ℂ) ≠ 0 := by norm_cast --this step is necessary
     -- since our proof hCoker_Rank required the hypothesis that G was a linear map
     -- but we had that G was a continuous linear map (as all members of strong dual are)

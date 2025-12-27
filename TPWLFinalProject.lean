@@ -62,7 +62,26 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 -- A lemma which states that we can extract a unit vector from a unidimensional module
 lemma exists_unit_vector_of_finrank_one {U : Submodule ℂ E} (h_dim : Module.finrank ℂ U = 1) :
   ∃ z ∈ U, ‖z‖ = 1 := by
-  sorry -- Standard linear algebra: existence of basis vector.
+have h2 : Module.Finite ℂ U := by
+    apply Module.finite_of_finrank_pos
+    rw[h_dim]
+    exact zero_lt_one
+let b := Module.finBasisOfFinrankEq ℂ U h_dim
+let v := b 0
+have hv : v ≠ 0 := b.ne_zero 0
+let z1 := (‖v‖ : ℂ)⁻¹ • v
+use z1
+constructor
+· simp only [SetLike.coe_mem] -- accessed via simp?
+simp only [z1]
+simp only [AddSubgroupClass.coe_norm, SetLike.val_smul]
+rw[norm_smul]
+rw[norm_inv]
+simp only [Complex.norm_real, norm_norm]
+refine inv_mul_cancel₀ ?_ --accessed via apply?
+rw [norm_ne_zero_iff]
+simp only [ne_eq, ZeroMemClass.coe_eq_zero]
+exact hv -- Standard linear algebra: existence of basis vector.
 
 --Proving that if z is a unit vector that spans the orthogonal complement
 -- of the kernel of G, then for any vector x, the vector (x - ⟨z,x⟩z) lies

@@ -87,9 +87,18 @@ exact hv -- Standard linear algebra: existence of basis vector.
 -- of the kernel of G, then for any vector x, the vector (x - ⟨z,x⟩z) lies
 -- in the kernel of G. (I.e. removing the component "perpendicular" to the
 -- kernel gives a vector in the kernel)
+
+end inner_product_space_theorems
+-- Section for Hilbert Spaces
+section hilbert_space_theorems
+
+-- We add the completeness assumption
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+variable [CompleteSpace E]
+open scoped ComplexInnerProductSpace
+
 lemma mem_kernel_of_orthogonal_sub
   (G: StrongDual ℂ E)(z : E)
-  (hz_perp : z ∈ (LinearMap.ker G)ᗮ)
   (hz_unit : ‖z‖ = 1)
   (h_span : ∀ v ∈ (LinearMap.ker G)ᗮ, ∃ c : ℂ, v = c • z) -- Assumption: Kᗮ is 1D
   (x : E) :
@@ -103,7 +112,8 @@ lemma mem_kernel_of_orthogonal_sub
 
   -- [Assumption]: Double Orthogonal Complement for closed subspaces.
   -- We need to get rid of this sorry
-  have h_double_perp : K = Kᗮᗮ := by sorry
+  have h_double_perp : K = Kᗮᗮ := by
+    exact (Submodule.orthogonal_orthogonal K).symm
 
   -- Step 1: Reformulate goal from "G u = 0" to "u ∈ K"
   change x - ⟪z, x⟫ • z ∈ K
@@ -123,16 +133,6 @@ lemma mem_kernel_of_orthogonal_sub
   -- Calculation: ⟪z, x⟩ - ⟪z, x⟩ * ⟪z, z⟩ = 0
   rw [inner_sub_right, inner_smul_right, h_norm]
   simp only [mul_one, sub_self]
-
-
-end inner_product_space_theorems
--- Section for Hilbert Spaces
-section hilbert_space_theorems
-
--- We add the completeness assumption
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-variable [CompleteSpace E]
-open scoped ComplexInnerProductSpace
 
 
 -- This is a theorem that proves that if V is a complete inner product space and U
@@ -236,7 +236,7 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     use y; intro x
     -- 4. [Conclusion A]: Derive G(x) from the kernel property
     -- We know G(x - ⟨z, x⟩z) = 0 from Step 6
-    have h_ker_zero := mem_kernel_of_orthogonal_sub G z hz_mem hz_unit h_span x
+    have h_ker_zero := mem_kernel_of_orthogonal_sub G z hz_unit h_span x
     -- Rearrange G(x - ...) = 0 into G(x) = ⟨z, x⟩ * G(z)
     rw [map_sub, map_smul, sub_eq_zero] at h_ker_zero
     rw [h_ker_zero]

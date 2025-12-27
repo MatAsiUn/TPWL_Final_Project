@@ -125,14 +125,6 @@ lemma mem_kernel_of_orthogonal_sub
   simp only [mul_one, sub_self]
 
 
-
-
- -- The statment of Riesz Representation Theorem for a trivial G (G identically 0)
-lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G = 0):
- G x = ⟪0,x⟫ := by
- rw[h]
- simp
-
 end inner_product_space_theorems
 -- Section for Hilbert Spaces
 section hilbert_space_theorems
@@ -165,15 +157,22 @@ noncomputable def Quotient_Iso_Perp(U: Submodule ℂ E)(hU: IsClosed (U : Set E)
     -- p then E/p is isomorphic to q
     exact Submodule.quotientEquivOfIsCompl U Uᗮ h_compl
 
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+--Here is the start of the main "meat" of the proof of Riesz's representation theorem-----
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 --We first start by proving Existence. Note that the inner product is linear in the second
 --(antilinear in the first argument) so the statement must change to reflect this
 theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
  ∃ v : E, ∀ x : E, G x = ⟪v,x⟫ := by
+ --first we split it up into cases to get rid of the trivial case (where G is the 0 functional)
  by_cases hG : G = 0
  {
     use 0
     intro x
-    exact Riesz_Representation_Theorem_TrivialG G hG
+    rw[hG]
+    simp
  }
  {
     -- By definition we get that LinearMap.ker G is a submodule

@@ -45,6 +45,11 @@ lemma exists_unit_vector_of_finrank_one {U : Submodule ℂ E} (h_dim : Module.fi
   4. Since Kᗮ is 1-dimensional (spanned by z), checking orthogonality against z is sufficient.
   5. The calculation reduces to ⟨z, x⟩ - ⟨z, x⟩ * 1 = 0.
 --/
+
+--Proving that if z is a unit vector that spans the orthogonal complement
+-- of the kernel of G, then for any vector x, the vector (x - ⟨z,x⟩z) lies
+-- in the kernel of G. (I.e. removing the component "perpendicular" to the
+-- kernel gives a vector in the kernel)
 lemma mem_kernel_of_orthogonal_sub
   (z : E)
   (hz_perp : z ∈ (LinearMap.ker G)ᗮ) -- Using (LinearMap.ker G) ensures consistency with topological definition
@@ -96,11 +101,11 @@ lemma mem_kernel_of_orthogonal_sub
 --/
 theorem riesz_existence_part_III
   (_hG_ne : G ≠ 0) -- Underscore suppresses "unused variable" warning
-  (h_dim : Module.finrank ℂ (LinearMap.ker G)ᗮ = 1) : -- Matches (LinearMap.ker G)ᗮ type in Step 6
+  (hPerp_Rank : Module.finrank ℂ (LinearMap.ker G)ᗮ = 1) : -- Matches (LinearMap.ker G)ᗮ type in Step 6
   ∃ y : E, ∀ x : E, G x = ⟪y, x⟫ := by
 
   -- 1. Setup: Obtain z from the 1-dimensional orthogonal complement
-  have ⟨z, hz_mem, hz_unit⟩ := exists_unit_vector_of_finrank_one h_dim
+  have ⟨z, hz_mem, hz_unit⟩ := exists_unit_vector_of_finrank_one hPerp_Rank
 
   -- 2. Prove the span property: (LinearMap.ker G)ᗮ is spanned by z.
   -- Logic: If dim(V)=1 and z ∈ V is non-zero, then V = span{z}.
@@ -122,11 +127,11 @@ theorem riesz_existence_part_III
 
       -- 2. Dimension equality: 1 = 1
       have h_dim_eq : Module.finrank ℂ (Submodule.span ℂ {z}) = Module.finrank ℂ (LinearMap.ker G)ᗮ := by
-        rw [h_dim_span, h_dim]
+        rw [h_dim_span, hPerp_Rank]
 
       -- 3. [Technical]: Explicitly state finiteness to help Lean's type inference
       haveI : Module.Finite ℂ (LinearMap.ker G)ᗮ :=
-        Module.finite_of_finrank_pos (by rw [h_dim]; norm_num)
+        Module.finite_of_finrank_pos (by rw [hPerp_Rank]; norm_num)
 
       -- 4. Apply equality theorem
       exact Submodule.eq_of_le_of_finrank_eq h_le h_dim_eq

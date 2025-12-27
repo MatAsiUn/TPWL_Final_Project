@@ -29,6 +29,7 @@ variable (G : StrongDual ℂ E)
 --/
 lemma exists_unit_vector_of_finrank_one {U : Submodule ℂ E} (h_dim : Module.finrank ℂ U = 1) :
   ∃ z ∈ U, ‖z‖ = 1 := by
+
   sorry -- Standard linear algebra: existence of basis vector.
 
 -- ==========================================

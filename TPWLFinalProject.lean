@@ -10,7 +10,7 @@ import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Submodule --Needed for statement of theorem
 --Quotient_Iso_Perp
 import Mathlib.Topology.Algebra.Module.LinearMap --Needed for ContinuousLinearMap.isClosed_ker
-
+set_option linter.style.longLine false
 set_option linter.style.commandStart false
 
 --Mathlib.Analysis.NormedSpace does indeed not exist

@@ -146,7 +146,8 @@ noncomputable def Quotient_Iso_Perp(U: Submodule ℂ E)(hU: IsClosed (U : Set E)
     -- p then E/p is isomorphic to q
     exact Submodule.quotientEquivOfIsCompl U Uᗮ h_compl
 
---We first start by proving Existence
+--We first start by proving Existence. Note that the inner product is linear in the second
+--(antilinear in the first argument) so the statement must change to reflect this
 theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
  ∃ v : E, ∀ x : E, G x = ⟪v,x⟫ := by
  by_cases hG : G = 0
@@ -232,6 +233,7 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     rw [smul_eq_mul]
  }
 
+-- We use existence to prove uniqueness
 theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
  ∃! v : E, ∀ x : E, G x = ⟪v,x⟫ := by
  sorry

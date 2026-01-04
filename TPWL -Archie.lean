@@ -8,6 +8,7 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 --import Mathlib.Analysis.Normed.Module.Basic
 --import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 set_option linter.style.commandStart false
 
@@ -49,3 +50,14 @@ variable[CompleteSpace E]
  --sorry
 
  -- Cauchy-Schwartz
+
+theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
+ ∃! v : E, ∀ x : E, G x = ⟪v,x⟫ := by
+ sorry
+
+ -- Riesz corollary, to prove that canonical map is an isometric conjugate-linear
+ -- isomorphism
+ -- defn required "noncomputable"
+
+noncomputable def canonical_map (v : E) : StrongDual ℂ E :=
+  (innerSL ℂ : E →L⋆[ℂ] E →L[ℂ] ℂ) v

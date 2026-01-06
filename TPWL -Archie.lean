@@ -55,9 +55,32 @@ theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
  ∃! v : E, ∀ x : E, G x = ⟪v,x⟫ := by
  sorry
 
- -- Riesz corollary, to prove that canonical map is an isometric conjugate-linear
- -- isomorphism
- -- defn required "noncomputable"
+ -- We prove a nice corollary of Riesz Rep that every non-trivial, bounded,
+ -- linear operator attains it's norm
+lemma Riesz_Corollary_func_attains_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
+  ∃ x : E, ‖x‖ = 1 ∧ ‖G x‖ = ‖G‖ := by
+  -- Get v from Riesz
+  obtain ⟨v, hv, hvuniq⟩ := Riesz_Representation_Theorem G
+  have hv_ne : v ≠ 0 := by
+   intro h
+   apply hG
+   ext z
+   simp [hv, h]
+  let x := (‖v‖)⁻¹ • v
 
-noncomputable def canonical_map (v : E) : StrongDual ℂ E :=
-  (innerSL ℂ : E →L⋆[ℂ] E →L[ℂ] ℂ) v
+  have hx_norm: ‖x‖ = 1 := by
+   rw [norm_smul, norm_inv, norm_norm]
+   apply inv_mul_cancel₀
+   exact norm_ne_zero_iff.mpr hv_ne
+
+  have hx_attains : ‖G x‖ = ‖G‖ := by
+   have hx_val: ‖G x‖ = ‖v‖ := by
+     rw[hv]
+     sorry
+
+   have h_op : ‖G‖ = ‖v‖ := by
+     refine le_antisymm ?_ ?_
+     apply (ContinuousLinearMap.opNorm_le_iff ?_).mpr ?_
+     sorry
+
+  exact ⟨x, hx_norm, hx_attains⟩

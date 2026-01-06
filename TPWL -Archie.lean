@@ -37,43 +37,34 @@ lemma KerGClosed (G: StrongDual ℂ E): IsClosed (LinearMap.ker G : Set E) := by
 -- Introduce Hilber Space variable (and add strong dual to make life easier)
 variable[CompleteSpace E]
 
---def kernel_of_G : Set E := { x : E | G x = 0 }
-
--- Prove that it is closed
--- lemma kernel_of_G_is_closed : IsClosed (kernel_of_G G) := by
- -- G is continuous as it is in the dual
- --have hG : Continuous G := G.continuous
-
- -- {0} is closed as it is a singleton set
- --have h0 : IsClosed ({0} : Set ℂ) := isClosed_singleton
- --exact?
- --sorry
-
- -- Cauchy-Schwartz
-
 theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
  ∃! v : E, ∀ x : E, G x = ⟪v,x⟫ := by
  sorry
 
- -- We prove a nice corollary of Riesz Rep that every non-trivial, bounded,
+ -- Proving a nice corollary of Riesz Rep that every non-trivial, bounded,
  -- linear operator attains it's norm
-lemma Riesz_Corollary_func_attains_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
+lemma elements_of_dual_space_attain_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
   ∃ x : E, ‖x‖ = 1 ∧ ‖G x‖ = ‖G‖ := by
-  -- Get v from Riesz
-  obtain ⟨v, hv, hvuniq⟩ := Riesz_Representation_Theorem G
+  -- We first obtain v from Riesz
+  obtain ⟨v, hv, _⟩ := Riesz_Representation_Theorem G
+
+  --Prove the case for trivial G
   have hv_ne : v ≠ 0 := by
    intro h
    apply hG
    ext z
    simp [hv, h]
-  let x := (‖v‖)⁻¹ • v
+  let x := (‖v‖)⁻¹ • v -- Define our candidate x
 
+  -- First justify the norm of x is 1
   have hx_norm: ‖x‖ = 1 := by
    rw [norm_smul, norm_inv, norm_norm]
    apply inv_mul_cancel₀
    exact norm_ne_zero_iff.mpr hv_ne
 
+  -- We now show that the absolute value of G(x) is the operator norm of G
   have hx_attains : ‖G x‖ = ‖G‖ := by
+  -- We split into cases to show each side of the equality equals the norm of v
    have h_val: ‖G x‖ = ‖v‖ := by
      rw [hv, inner_smul_right_eq_smul]
      rw [norm_smul, norm_inv, norm_norm]
@@ -81,9 +72,16 @@ lemma Riesz_Corollary_func_attains_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
      simp only [Complex.coe_algebraMap, norm_pow, Complex.norm_real, norm_norm]
      field_simp
 
+  -- Showing both inequality in both directions will give us the equality we need
    have h_op : ‖G‖ = ‖v‖ := by
-     --refine le_antisymm ?_ ?_
-     --apply (ContinuousLinearMap.opNorm_le_iff ‖v‖).mpr ?_
-     sorry
+     refine le_antisymm ?_ ?_
+     · -- Proving ‖G‖ ≤ ‖v‖
+       rw [ContinuousLinearMap.opNorm_le_iff (norm_nonneg v)]
+       intro y
+       rw[hv y]
+       exact norm_inner_le_norm v y
+     · -- Proving ‖G‖ ≥ ‖v‖
+       rw [← h_val]
+       exact ContinuousLinearMap.unit_le_opNorm G x hx_norm.le
    rw [h_val, h_op]
   exact ⟨x, hx_norm, hx_attains⟩

@@ -269,7 +269,7 @@ lemma inner_orth_zero (w : E) (h : ∀ x : E, ⟪w, x⟫ = 0) : w = 0 := by
 Uniqueness: if the same continuous linear functional G is represented by v1 and v2,
 then v1 = v2.
 -/
-lemma riesz_uniqueness {G : StrongDual ℂ E} {v1 v2 : E}
+lemma Riesz_Representation_Theorem_Uniqueness {G : StrongDual ℂ E} {v1 v2 : E}
 (h1 : ∀ x : E, G x = ⟪v1, x⟫) (h2 : ∀ x : E, G x = ⟪v2, x⟫) :
 v1 = v2 := by
   -- Strategy:
@@ -296,6 +296,56 @@ theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
   obtain ⟨v, hv⟩ := Riesz_Representation_Theorem_Existence (E := E) G
   refine ⟨v, hv, ?_⟩
   intro w hw
-  exact riesz_uniqueness (G := G) hw hv
--- refine ExistsUnique.intro ?_ ?_ ?_
+  exact Riesz_Representation_Theorem_Uniqueness (G := G) hw hv
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+----This concludes the existence and uniqueness proofs of Riesz Representation Theorem----
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+-- We now prove an interesting corrollary of Riesz, that states that for any non-trivial G,
+-- we can find an x such that ‖G x‖ = ‖G‖, that is the operator norm is attained by some
+-- unit vector x.
+lemma elements_of_dual_space_attain_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
+  ∃ x : E, ‖x‖ = 1 ∧ ‖G x‖ = ‖G‖ := by
+  -- We first obtain v from Riesz
+  obtain ⟨v, hv, _⟩ := Riesz_Representation_Theorem G
+
+  --Prove the case for trivial G
+  have hv_ne : v ≠ 0 := by
+   intro h
+   apply hG
+   ext z
+   simp [hv, h]
+  let x := (‖v‖)⁻¹ • v -- Define our candidate x
+
+  -- First justify the norm of x is 1
+  have hx_norm: ‖x‖ = 1 := by
+   rw [norm_smul, norm_inv, norm_norm]
+   apply inv_mul_cancel₀
+   exact norm_ne_zero_iff.mpr hv_ne
+
+  -- We now show that the absolute value of G(x) is the operator norm of G
+  have hx_attains : ‖G x‖ = ‖G‖ := by
+  -- We split into cases to show each side of the equality equals the norm of v
+   have h_val: ‖G x‖ = ‖v‖ := by
+     rw [hv, inner_smul_right_eq_smul]
+     rw [norm_smul, norm_inv, norm_norm]
+     rw [inner_self_eq_norm_sq_to_K]
+     simp only [Complex.coe_algebraMap, norm_pow, Complex.norm_real, norm_norm]
+     field_simp
+
+  -- For ‖G‖ = ‖v‖ we show the inequality in both directions to give us equality
+   have h_op : ‖G‖ = ‖v‖ := by
+     refine le_antisymm ?_ ?_
+     · -- Proving ‖G‖ ≤ ‖v‖
+       rw [ContinuousLinearMap.opNorm_le_iff (norm_nonneg v)]
+       intro y
+       rw[hv y]
+       exact norm_inner_le_norm v y
+     · -- Proving ‖G‖ ≥ ‖v‖
+       rw [← h_val]
+       exact ContinuousLinearMap.unit_le_opNorm G x hx_norm.le
+   rw [h_val, h_op]
+  exact ⟨x, hx_norm, hx_attains⟩
 end hilbert_space_theorems

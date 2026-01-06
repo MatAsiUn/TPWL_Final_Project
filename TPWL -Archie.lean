@@ -74,13 +74,16 @@ lemma Riesz_Corollary_func_attains_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
    exact norm_ne_zero_iff.mpr hv_ne
 
   have hx_attains : ‖G x‖ = ‖G‖ := by
-   have hx_val: ‖G x‖ = ‖v‖ := by
-     rw[hv]
-     sorry
+   have h_val: ‖G x‖ = ‖v‖ := by
+     rw [hv, inner_smul_right_eq_smul]
+     rw [norm_smul, norm_inv, norm_norm]
+     rw [inner_self_eq_norm_sq_to_K]
+     simp only [Complex.coe_algebraMap, norm_pow, Complex.norm_real, norm_norm]
+     field_simp
 
    have h_op : ‖G‖ = ‖v‖ := by
-     refine le_antisymm ?_ ?_
-     apply (ContinuousLinearMap.opNorm_le_iff ?_).mpr ?_
+     --refine le_antisymm ?_ ?_
+     --apply (ContinuousLinearMap.opNorm_le_iff ‖v‖).mpr ?_
      sorry
-
+   rw [h_val, h_op]
   exact ⟨x, hx_norm, hx_attains⟩

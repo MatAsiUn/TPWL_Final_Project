@@ -7,13 +7,15 @@ import Mathlib.Analysis.InnerProductSpace.Defs
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Basic
-import Mathlib.Analysis.InnerProductSpace.Projection.Submodule --Needed for statement of theorem
+import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
+--Needed for statement of theorem
 --Quotient_Iso_Perp
+import Mathlib.Analysis.InnerProductSpace.Projection.Minimal --Needed for
+--The projection theorem
 import Mathlib.Topology.Algebra.Module.LinearMap --Needed for ContinuousLinearMap.isClosed_ker
 set_option linter.style.longLine false
 set_option linter.style.commandStart false
 
---
 
 --Useful Theorems:
 --Module.finBasisOfFinrankEq (generates a basis from a module of finite rank)
@@ -74,13 +76,12 @@ theorem Functional_Coker_Dim (f: V →ₗ[K] K)(hf : f ≠ 0):
     -- The upside down T is just the "bottom" subspace, in other words the zero subspace
     rw [bot_lt_iff_ne_bot]
     rw[ne_eq]
-    rw [LinearMap.range_eq_bot] --an amazing lemma
+    rw [LinearMap.range_eq_bot]
     exact hf
 
 
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
--- This is me working on the project after finishing what I had set out to do
 
 open scoped ComplexInnerProductSpace
 lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G = 0):
@@ -93,29 +94,83 @@ lemma Riesz_Representation_Theorem_TrivialG {x : E}(G: StrongDual ℂ E)(h: G = 
 
 variable [CompleteSpace E]
 
---for some reason we had to use noncomputable def instead of theorem
---proving this theorem was tough, and used a lot of weird lemmas
+-- This is a theorem that proves that U and U⟂ are complementary, that is
+-- to say that U ∩ U⟂ = {0} and U + U⟂ = E. It is in the proof of this theorem
+-- That we need the projection theorem
+theorem UandUperpCompl (U: Submodule ℂ E)(hU: IsClosed (U : Set E)):
+IsCompl U Uᗮ := by
+constructor
+· -- Goal 1: Want to show that U ∩ Uᗮ = 0
+    rw [Submodule.disjoint_def]
+    intro x hxU hxUperp
+    exact inner_self_eq_zero.mp (hxUperp x hxU)
+
+· -- Goal 2: Want to show that U + Uᗮ = E
+    refine Submodule.codisjoint_iff_exists_add_eq.mpr ?_ --accessed via apply?
+    intro z
+    have h_Complete : IsComplete (U: Set E) := by
+        exact IsClosed.isComplete hU
+    -- We know there is a vector of minimal distance to z in U by Hilbert's
+    -- projection theorem, the ⨅ symbol represents the infimum.
+    have h_MinimDist : ∃ z_0 ∈ (U : Set E), ‖z - z_0‖ = ⨅(w : ↥U) , ‖z - w‖ := by
+        apply Submodule.exists_norm_eq_iInf_of_complete_subspace U h_Complete z
+    -- We will now use z_0 as our witness but we first have to unpack the properties
+    -- we know about z_0
+    obtain ⟨z_0, hz_0U, hz_0MinimDist⟩ := h_MinimDist
+    use z_0, z-z_0
+    simp only [add_sub_cancel, and_true]
+    constructor
+    . --Goal 1, want to show that z_0 ∈ U
+        exact hz_0U
+    . -- Goal 2, wnat to show that z - z_0 ∈ U⟂
+        rw [Submodule.mem_orthogonal]
+        intro w hw
+        -- We will prove this by contradiction, by assuming ∃ w ∈ U such that
+        -- z - z_0 is not orthogonal to w
+        by_contra hNonZero
+        push_neg at hNonZero
+        by_cases hw_zero : w = 0
+        . --We need to be careful to disregard the case w = 0
+            subst hw_zero
+            simp [inner_zero_left] at hNonZero
+        . -- Now that we know that w ≠ 0 we can use it to construct a vector in U
+        -- closer to z
+            push_neg at hw_zero
+            let c := ⟪w, z - z_0⟫ / ‖w‖^2
+            -- z_0 + c • w will be the vector in U closer to z than z_0
+            have hz_1U : z_0 + c • w ∈ U := by
+                apply Submodule.add_mem
+                exact hz_0U
+                apply Submodule.smul_mem
+                exact hw
+            have hz_1closer : ‖z - z_0 - c • w‖^2 < ‖z - z_0‖^2 := by
+                have h_exp : ‖z - z_0 - c • w‖^2 = ⟪z - z_0 - c • w, z - z_0 - c • w⟫ := by
+                    rw [inner_self_eq_norm_sq_to_K]
+                    simp only [Complex.coe_algebraMap]
+                rw[h_exp]
+
+
+-- This is a theorem that proves that if V is a complete inner product space
+-- and U is a closed submodule of V, then V/U is isomorphic to U⟂.
+-- Since we are trying to construct an isomorphism and this isomorphism
+-- implicitly relies on the axiom of choice we want to use noncomputable def
 noncomputable def Quotient_Iso_Perp(U: Submodule ℂ E)(hU: IsClosed (U : Set E)):
     (E ⧸ U) ≃ₗ[ℂ] Uᗮ := by
     --We have that U is its own closure since U is closed
     have h_closure : U.topologicalClosure = U :=
     by exact IsClosed.submodule_topologicalClosure_eq hU
-    --Since U is a topological closure it is complete (there should be a way of doing
-    --it directly from definition of closed without needing topological closure)
+    --Since U is a topological closure it is complete
     have h_complete : CompleteSpace U :=
     by rw [← h_closure]; exact Submodule.topologicalClosure.completeSpace U
     -- Since U is complete it has an orthogonal projection
     have h_orth : U.HasOrthogonalProjection :=
     by exact Submodule.HasOrthogonalProjection.ofCompleteSpace U
-    -- We have that U and U⟂ are complementary in E (U ⊕ U⟂ = V)
+    -- We have that U and U⟂ are complementary in E (U ⊕ U⟂ = E, U ∩ U⟂ = {0})
     have h_compl : IsCompl U Uᗮ :=
     by exact Submodule.isCompl_orthogonal_of_hasOrthogonalProjection
-    -- And then we have a fantastic lemma that tells us that if q is a complement of
-    -- p then E/p is isomorphic to q
+    -- And then we have a  lemma that tells us that if q is a complement of
+    -- p (q ⊕ p = E, q ∩ p = {0} ) then E/p is isomorphic to q
     exact Submodule.quotientEquivOfIsCompl U Uᗮ h_compl
-
-
-    -- have hcompl : IsCompl U Uᗮ := Submodule.isCompl_orthogonal_of_hasOrthogonalProjection
 
 
 theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):

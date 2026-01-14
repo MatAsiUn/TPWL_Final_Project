@@ -97,10 +97,13 @@ rw [norm_ne_zero_iff]
 simp only [ne_eq, ZeroMemClass.coe_eq_zero]
 exact hv
 
---Proving that if z is a unit vector that spans the orthogonal complement
--- of the kernel of G, then for any vector x, the vector (x - ⟨z,x⟩z) lies
--- in the kernel of G. (I.e. removing the component "perpendicular" to the
--- kernel gives a vector in the kernel)
+--This lemma states that if a vector is orthogonal to every vector,
+--then it must be zero. It will be very useful when proving uniqueness.
+lemma inner_orth_zero (w : E) (h : ∀ x : E, ⟪w, x⟫ = 0) : w = 0 := by
+  have hww: ⟪w, w⟫ = 0 := by
+    simpa using h w
+  exact inner_self_eq_zero.mp hww
+
 
 end inner_product_space_theorems
 
@@ -275,24 +278,13 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     rw [smul_eq_mul]
  }
 
-set_option linter.unusedSectionVars false in
-/--
-Key lemma: if a vector is orthogonal to *every* vector, then it must be zero.
-This is the core idea behind uniqueness.
--/
-lemma inner_orth_zero (w : E) (h : ∀ x : E, ⟪w, x⟫ = 0) : w = 0 := by
-  have hww: ⟪w, w⟫ = 0 := by
-    simpa using h w
-  exact inner_self_eq_zero.mp hww
-  -- Proof idea (to be formalised):
-  -- Take x = w. Then:
-  --   inner w w = 0.
-  -- But inner product is positive definite, so this implies w = 0.
+set_option linter.unusedSectionVars false
 
 /--
 Uniqueness: if the same continuous linear functional G is represented by v1 and v2,
 then v1 = v2.
 -/
+
 lemma Riesz_Representation_Theorem_Uniqueness {G : StrongDual ℂ E} {v1 v2 : E}
 (h1 : ∀ x : E, G x = ⟪v1, x⟫) (h2 : ∀ x : E, G x = ⟪v2, x⟫) :
 v1 = v2 := by

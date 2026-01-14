@@ -20,16 +20,21 @@ set_option linter.style.commandStart false
 -- We use a nested structure to differentiate between results that are applicable in
 -- an Inner Product Space (IPS), and ones only applicable in a Hilbert Space.
 
---SECTION 1: Ancillary theorems, these are theorems that do not require
--- an inner product space structure
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+------Section 1: Ancillary theorems, these are theorems that do not require an -----------
+-------------------------inner product space structure------------------------------------
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
 
 
 section ancillary_theorems
 --Defining a Vector space V
 variable {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
--- The second theorem I have to formalise
--- I will actually try to prove the more general statement
+-- This theorem is a proof of the statement:
 -- For any vector space V and non-zero functional f, the
 -- dimension of the quotient space V / ker(f) is 1.
 theorem Functional_Coker_Dim (f: V →ₗ[K] K)(hf : f ≠ 0):
@@ -53,13 +58,22 @@ theorem Functional_Coker_Dim (f: V →ₗ[K] K)(hf : f ≠ 0):
 
 end ancillary_theorems
 
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+-------------------Section 2: Inner Product Space Theorems--------------------------------
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+
 section inner_product_space_theorems
 
 open scoped ComplexInnerProductSpace
--- This is active for our entire file
+-- Now instead of a vector space V, we instead define an inner product space E
+-- over ℂ
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 
--- A lemma which states that we can extract a unit vector from a unidimensional module
+-- This lemma states that we can extract a unit vector
+-- from a unidimensional module
 lemma exists_unit_vector_of_finrank_one {U : Submodule ℂ E} (h_dim : Module.finrank ℂ U = 1) :
   ∃ z ∈ U, ‖z‖ = 1 := by
 have h2 : Module.Finite ℂ U := by
@@ -81,7 +95,7 @@ simp only [Complex.norm_real, norm_norm]
 refine inv_mul_cancel₀ ?_ --accessed via apply?
 rw [norm_ne_zero_iff]
 simp only [ne_eq, ZeroMemClass.coe_eq_zero]
-exact hv -- Standard linear algebra: existence of basis vector.
+exact hv
 
 --Proving that if z is a unit vector that spans the orthogonal complement
 -- of the kernel of G, then for any vector x, the vector (x - ⟨z,x⟩z) lies
@@ -89,10 +103,18 @@ exact hv -- Standard linear algebra: existence of basis vector.
 -- kernel gives a vector in the kernel)
 
 end inner_product_space_theorems
--- Section for Hilbert Spaces
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+-------------------------Section 3: Hilbert Space Theorems--------------------------------
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+
 section hilbert_space_theorems
 
--- We add the completeness assumption
+-- We now define a module E as before, but we include the assumption that the
+-- space is complete
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 variable [CompleteSpace E]
 open scoped ComplexInnerProductSpace
@@ -135,35 +157,37 @@ lemma mem_kernel_of_orthogonal_sub
   simp only [mul_one, sub_self]
 
 
--- This is a theorem that proves that if V is a complete inner product space and U
--- is a closed submodule of V, then V/U is isomorphic to U⟂. This fact will be
--- very useful since we have that U = ker(G)
+-- This is a theorem that proves that if V is a complete inner product space
+-- and U is a closed submodule of V, then V/U is isomorphic to U⟂.
+-- Since we are trying to construct an isomorphism and this isomorphism
+-- implicitly relies on the axiom of choice we want to use noncomputable def
 noncomputable def Quotient_Iso_Perp(U: Submodule ℂ E)(hU: IsClosed (U : Set E)):
     (E ⧸ U) ≃ₗ[ℂ] Uᗮ := by
     --We have that U is its own closure since U is closed
     have h_closure : U.topologicalClosure = U :=
     by exact IsClosed.submodule_topologicalClosure_eq hU
-    --Since U is a topological closure it is complete (there should be a way of doing
-    --it directly from definition of closed without needing topological closure)
+    --Since U is a topological closure it is complete
     have h_complete : CompleteSpace U :=
     by rw [← h_closure]; exact Submodule.topologicalClosure.completeSpace U
     -- Since U is complete it has an orthogonal projection
     have h_orth : U.HasOrthogonalProjection :=
     by exact Submodule.HasOrthogonalProjection.ofCompleteSpace U
-    -- We have that U and U⟂ are complementary in E (U ⊕ U⟂ = V)
+    -- We have that U and U⟂ are complementary in E (U ⊕ U⟂ = E, U ∩ U⟂ = {0})
     have h_compl : IsCompl U Uᗮ :=
     by exact Submodule.isCompl_orthogonal_of_hasOrthogonalProjection
-    -- And then we have a fantastic lemma that tells us that if q is a complement of
-    -- p then E/p is isomorphic to q
+    -- And then we have a  lemma that tells us that if q is a complement of
+    -- p (q ⊕ p = E, q ∩ p = {0} ) then E/p is isomorphic to q
     exact Submodule.quotientEquivOfIsCompl U Uᗮ h_compl
 
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
---Here is the start of the main "meat" of the proof of Riesz's representation theorem-----
+--------------Section 4: Proof of Riesz's representation theorem (Existence) -------------
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
---We first start by proving Existence. Note that the inner product is linear in the second
---(antilinear in the first argument) so the statement must change to reflect this
+-- We first start by proving Existence. Note that the inner product (as defined in
+-- in Lean) is linear in the second (antilinear in the first argument) so the
+-- statement must change to reflect this. I think this is done because in Physics
+-- the convention is to make the inner product linear in the second argument.
 theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
  ∃ v : E, ∀ x : E, G x = ⟪v,x⟫ := by
  --first we split it up into cases to get rid of the trivial case (where G is the 0 functional)
@@ -181,7 +205,8 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     by exact ContinuousLinearMap.isClosed_ker G
     have hG_lin : (G : E →ₗ[ℂ] ℂ) ≠ 0 := by norm_cast --this step is necessary
     -- since our proof hCoker_Rank required the hypothesis that G was a linear map
-    -- but we had that G was a continuous linear map (as all members of strong dual are)
+    -- but we had that G was a continuous linear map (as all members of strong dual
+    -- are) This makes Lean recognise G as we want it to
     -- We can now use our lemma from before to show that the dimension of the cokernel
     -- must be 1
     have hCoker_Rank : Module.finrank ℂ (E ⧸ LinearMap.ker G) = 1 :=

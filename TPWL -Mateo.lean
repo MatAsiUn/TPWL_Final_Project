@@ -147,7 +147,47 @@ constructor
                 have h_exp : ‖z - z_0 - c • w‖^2 = ⟪z - z_0 - c • w, z - z_0 - c • w⟫ := by
                     rw [inner_self_eq_norm_sq_to_K]
                     simp only [Complex.coe_algebraMap]
-                rw[h_exp]
+                sorry
+            sorry
+
+
+
+-- This is a theorem that proves that U and U⟂ are complementary, that is
+-- to say that U ∩ U⟂ = {0} and U + U⟂ = E. It is in the proof of this theorem
+-- That we need the projection theorem
+theorem UandUperpCompl2 (U: Submodule ℂ E)(hU: IsClosed (U : Set E)):
+IsCompl U Uᗮ := by
+constructor
+· -- Goal 1: Want to show that U ∩ Uᗮ = 0
+    rw [Submodule.disjoint_def]
+    intro x hxU hxUperp
+    exact inner_self_eq_zero.mp (hxUperp x hxU)
+
+· -- Goal 2: Want to show that U + Uᗮ = E
+    refine Submodule.codisjoint_iff_exists_add_eq.mpr ?_ --accessed via apply?
+    intro z
+    have h_Complete : IsComplete (U: Set E) := by
+        exact IsClosed.isComplete hU
+    -- We know there is a vector of minimal distance to z in U by Hilbert's
+    -- projection theorem, the ⨅ symbol represents the infimum.
+    have h_MinimDist : ∃ z_0 ∈ (U : Set E), ‖z - z_0‖ = ⨅(w : ↥U) , ‖z - w‖ := by
+        apply Submodule.exists_norm_eq_iInf_of_complete_subspace U h_Complete z
+    -- We will now use z_0 as our witness but we first have to unpack the properties
+    -- we know about z_0
+    obtain ⟨z_0, hz_0U, hz_0MinimDist⟩ := h_MinimDist
+    use z_0, z-z_0
+    simp only [add_sub_cancel, and_true]
+    constructor
+    · --Goal 1, want to show that z_0 ∈ U
+        exact hz_0U
+    · -- Goal 2, wnat to show that z - z_0 ∈ U⟂
+        rw [Submodule.mem_orthogonal]
+        intro u hu
+        rw [inner_eq_zero_symm]
+        revert u hu
+        rw [←Submodule.norm_eq_iInf_iff_inner_eq_zero U hz_0U]
+        exact hz_0MinimDist
+
 
 
 -- This is a theorem that proves that if V is a complete inner product space

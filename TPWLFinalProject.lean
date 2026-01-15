@@ -7,8 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Defs
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Basic
-import Mathlib.Analysis.InnerProductSpace.Projection.Submodule --Needed for statement of theorem
---Quotient_Iso_Perp
+import Mathlib.Analysis.InnerProductSpace.Projection.Minimal -- This module contains
+--the projection theorem. It is used to prove the theorem UandUperpCompl
 import Mathlib.Topology.Algebra.Module.LinearMap --Needed for ContinuousLinearMap.isClosed_ker
 set_option linter.style.longLine false
 set_option linter.style.commandStart false
@@ -122,6 +122,95 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 variable [CompleteSpace E]
 open scoped ComplexInnerProductSpace
 
+-- This is a theorem that proves that if U is a Hilbert space, then U and U⟂
+-- are complementary, that is
+-- to say that U ∩ U⟂ = {0} and U + U⟂ = E. The proof of this theorem requires the
+-- projection theorem
+theorem UandUperpCompl (U: Submodule ℂ E)(hU: IsClosed (U : Set E)):
+IsCompl U Uᗮ := by
+constructor
+· -- Goal 1: Want to show that U ∩ Uᗮ = 0
+    rw [Submodule.disjoint_def]
+    intro x hxU hxUperp
+    exact inner_self_eq_zero.mp (hxUperp x hxU)
+
+· -- Goal 2: Want to show that U + Uᗮ = E
+    refine Submodule.codisjoint_iff_exists_add_eq.mpr ?_ --accessed via apply?
+    intro z
+    have h_Complete : IsComplete (U: Set E) := by
+        exact IsClosed.isComplete hU
+    -- We know there is a vector of minimal distance to z in U by Hilbert's
+    -- projection theorem, the ⨅ symbol represents the infimum in Lean.
+    have h_MinimDist : ∃ z_0 ∈ (U : Set E), ‖z - z_0‖ = ⨅(w : ↥U) , ‖z - w‖ := by
+        apply Submodule.exists_norm_eq_iInf_of_complete_subspace U h_Complete z
+    -- We will now use z_0 as our witness but we first have to unpack the properties
+    -- we know about z_0
+    obtain ⟨z_0, hz_0U, hz_0MinimDist⟩ := h_MinimDist
+    use z_0, z-z_0
+    simp only [add_sub_cancel, and_true]
+    constructor
+    · --Goal 1, want to show that z_0 ∈ U
+        exact hz_0U
+    · -- Goal 2, wnat to show that z - z_0 ∈ U⟂
+        rw [Submodule.mem_orthogonal]
+        intro u hu
+        rw [inner_eq_zero_symm]
+        revert u hu
+        rw [←Submodule.norm_eq_iInf_iff_inner_eq_zero U hz_0U]
+        exact hz_0MinimDist
+
+
+-- This is a theorem that proves that if U is a closed subspace, then Uᗮᗮ = U
+theorem PerpIsPerp (U: Submodule ℂ E)(hU: IsClosed (U : Set E)): Uᗮᗮ = U := by
+apply le_antisymm
+swap
+· --First we start by proving that U ⊆ Uᗮᗮ.
+    intro u hu
+    rw [Submodule.mem_orthogonal]
+    intro u1 hu1
+    rw [inner_eq_zero_symm]
+    exact hu1 u hu
+· -- Then we show that Uᗮᗮ ⊆ U. This part again requires the projection theorem
+-- We start by considering an arbitrary u ∈ U
+    intro u hu
+    -- We know that U and Uᗮ are complementary from the theorem we previously proved.
+    have U_compl : IsCompl U Uᗮ := UandUperpCompl U hU
+    -- Since U and Uᗮ are complementary we know that their direct sum (⊔) is the
+    -- whole module (the top element)
+    have h_sum_top : U ⊔ Uᗮ = ⊤ := U_compl.sup_eq_top
+    have h_udecomp1 : u ∈ U ⊔ Uᗮ := by
+        rw [h_sum_top]
+        exact Submodule.mem_top
+    -- Therefore we can write u = u_1 + u_2 with u_1 ∈ U and u_2 ∈ Uᗮ
+    rcases Submodule.mem_sup.1 h_udecomp1 with ⟨u_1, hu_1, u_2, hu_2, h_sum⟩
+    -- It is sufficient to prove that u = u_1, it is also sufficient to prove that
+    -- u_2 = 0
+    suffices h_suf : u = u_1 by
+        rw [h_suf]
+        exact hu_1
+    suffices h_suf2 : u_2 = 0 by
+        rw[←h_sum]
+        simp only [add_eq_left]
+        exact h_suf2
+    -- We know that ⟪u, u_2⟫ = 0 (since u_2 ∈ Uᗮ and u ∈ Uᗮᗮ)
+    have uu_2inner : ⟪u, u_2⟫ = 0 := by
+        rw[Submodule.mem_orthogonal] at hu
+        rw [inner_eq_zero_symm]
+        exact hu u_2 hu_2
+    rw [← h_sum] at uu_2inner
+    rw[inner_add_left] at uu_2inner
+    -- Because u_1 ∈ U and u_2 ∈ Uᗮ, their inner product is zero
+    have h_u1_u2_orth :  ⟪u_1, u_2⟫ = 0 := by
+        rw [Submodule.mem_orthogonal] at hu_2
+        exact hu_2 u_1 hu_1
+    rw[h_u1_u2_orth] at uu_2inner
+    simp only [zero_add] at uu_2inner
+    rw [inner_self_eq_zero] at uu_2inner
+    exact uu_2inner
+
+
+
+
 lemma mem_kernel_of_orthogonal_sub
   (G: StrongDual ℂ E)(z : E)
   (hz_unit : ‖z‖ = 1)
@@ -136,9 +225,9 @@ lemma mem_kernel_of_orthogonal_sub
   let K := LinearMap.ker G
 
   -- [Assumption]: Double Orthogonal Complement for closed subspaces.
-  -- We need to get rid of this sorry
+  have hK_closed : IsClosed (K : Set E) := ContinuousLinearMap.isClosed_ker G
   have h_double_perp : K = Kᗮᗮ := by
-    exact (Submodule.orthogonal_orthogonal K).symm
+    exact (PerpIsPerp K hK_closed).symm
 
   -- Step 1: Reformulate goal from "G u = 0" to "u ∈ K"
   change x - ⟪z, x⟫ • z ∈ K
@@ -160,6 +249,7 @@ lemma mem_kernel_of_orthogonal_sub
   simp only [mul_one, sub_self]
 
 
+
 -- This is a theorem that proves that if V is a complete inner product space
 -- and U is a closed submodule of V, then V/U is isomorphic to U⟂.
 -- Since we are trying to construct an isomorphism and this isomorphism
@@ -177,7 +267,9 @@ noncomputable def Quotient_Iso_Perp(U: Submodule ℂ E)(hU: IsClosed (U : Set E)
     by exact Submodule.HasOrthogonalProjection.ofCompleteSpace U
     -- We have that U and U⟂ are complementary in E (U ⊕ U⟂ = E, U ∩ U⟂ = {0})
     have h_compl : IsCompl U Uᗮ :=
-    by exact Submodule.isCompl_orthogonal_of_hasOrthogonalProjection
+    -- This is where we use our previously proved theorem about the perpenndicular
+    -- Subspace being complementary
+    by exact UandUperpCompl U hU
     -- And then we have a  lemma that tells us that if q is a complement of
     -- p (q ⊕ p = E, q ∩ p = {0} ) then E/p is isomorphic to q
     exact Submodule.quotientEquivOfIsCompl U Uᗮ h_compl

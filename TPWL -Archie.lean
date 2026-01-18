@@ -12,7 +12,9 @@ import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 set_option linter.style.commandStart false
 
--- We define what it means for a functional to be linear
+
+-- Was not needed in the end, we decided to the innerprod defn and not
+-- define our own functional
 def linear_function_prop (K V : Type _) [Field K] [AddCommGroup V] [Module K V] (F: V → K) :=
   ∀ (x y : V) (a b : K), F (a • x + b • y) = a * (F x) + b * (F y)
 -- Note that "V" is our vector space here
@@ -85,3 +87,14 @@ lemma elements_of_dual_space_attain_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
        exact ContinuousLinearMap.unit_le_opNorm G x hx_norm.le
    rw [h_val, h_op]
   exact ⟨x, hx_norm, hx_attains⟩
+
+
+  --- Corollary 2: Proving all Hilbert Spaces are Reflexive
+
+  --- We first define the canoncical embedding map:
+
+def canonical_embedding := --- how should we define do we think?
+
+theorem Hilbert_is_Reflexive (Φ : StrongDual ℂ (StrongDual ℂ E)) :
+  ∃ v : E, Φ = canonical_embedding v := by
+  sorry

@@ -18,8 +18,6 @@ Summary of everyone's contributions:
 
 - Thomas
 
-- Mike completed the final steps of the existence part of the Riesz Representation Theorem proof (Outline Steps 6–7) and also formalized two interesting lemmas: the polarization identity and the parallelogram law in complex inner product spaces.
-
-Note / acknowledgement. Because my local Lean was unreliable (stuck loading), I wrote and tested the code in Lean 4 Web and then sent it to Mateo, who kindly tested it in the repository environment and integrated/committed it on my behalf (so the Git history may show Mateo as the committer).
+- Mike completed the final steps of the existence part of the Riesz Representation Theorem proof (Outline Steps 6–7) and also formalized two interesting lemmas: the polarization identity and the parallelogram law in complex inner product spaces. (Note / acknowledgement: Because my local Lean was unreliable (stuck loading), I wrote and tested the code in Lean 4 Web and then sent it to Mateo, who kindly tested it in the repository environment and integrated/committed it on my behalf (so the Git history may show Mateo as the committer).)
 
 

@@ -106,3 +106,40 @@ theorem riesz_existence_part_III
   rw [mul_comm]
   -- Unifies Scalar Multiplication (•) with Standard Multiplication (*) in ℂ
   rw [smul_eq_mul]
+
+
+
+
+
+
+/-
+We prove the **polarization identity** in a complex inner product space:
+the inner product ⟪x, y⟫ can be recovered from a combination of four squared norms.
+
+This is a small but interesting lemma: it shows that, over ℂ, the norm uniquely determines
+the inner product (a fact used frequently in Hilbert space theory).
+-/
+
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+
+lemma Polarization_Identity_v1 (x y : E) :
+    (4 : ℂ) * ⟪x, y⟫
+      =
+      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
+        + (↑‖x - I • y‖ ^ 2 - ↑‖x + I • y‖ ^ 2) * I) := by
+  have h :=
+    (inner_eq_sum_norm_sq_div_four (E := E) (𝕜 := ℂ) (x := x) (y := y))
+  have h4 : (4 : ℂ) ≠ 0 := by norm_num
+  rw [h]
+  field_simp [h4]
+  simp
+
+lemma Polarization_Identity_v2 (x y : E) :
+    (4 : ℂ) * ⟪x, y⟫
+      =
+      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
+        + I * ↑‖x - I • y‖ ^ 2 - I * ↑‖x + I • y‖ ^ 2) := by
+  have hv1 := Polarization_Identity_v1 (x := x) (y := y)
+  rw [hv1]
+  ring_nf
+

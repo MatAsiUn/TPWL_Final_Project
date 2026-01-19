@@ -12,13 +12,6 @@ import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 set_option linter.style.commandStart false
 
-
--- Was not needed in the end, we decided to the innerprod defn and not
--- define our own functional
-def linear_function_prop (K V : Type _) [Field K] [AddCommGroup V] [Module K V] (F: V → K) :=
-  ∀ (x y : V) (a b : K), F (a • x + b • y) = a * (F x) + b * (F y)
--- Note that "V" is our vector space here
-
 open scoped ComplexInnerProductSpace
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 
@@ -107,13 +100,35 @@ lemma elements_of_dual_space_attain_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
  --- famous theorems in mathematics. I recreate the proof we
  --- used in MA3G7 Functional Analysis 1
 theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
-  ‖x + y‖^2 = ‖x‖^2 + ‖y‖^2 := by
+   ‖x + y‖^2 = ‖x‖^2 + ‖y‖^2 := by
    --- First expand the inner product
-  have h1 : ‖x + y‖ ^ 2 = ‖x‖ ^ 2 + 2 * (RCLike.re ⟪x, y⟫) + ‖y‖ ^ 2 := by
+  have h_exp : ‖x + y‖ ^ 2 = ‖x‖ ^ 2 + 2 * (RCLike.re ⟪x, y⟫) + ‖y‖ ^ 2 := by
    exact norm_add_sq x y
-  have h2 : RCLike.re (inner ℂ x y) = 0 := by --- effectively the same statment as our assumption
+   --- The real part of the inner product is also 0
+  have h_zer : RCLike.re (⟪x, y⟫) = 0 := by
     rw [h]
     simp
-  rw [h1]
-  rw [h2]
+  --- Combine the two
+  rw [h_exp]
+  rw [h_zer]
   simp
+
+  --- We now prove the Cauchy-Schwartz inequality, another very important
+  --- theorem for inner product spaces
+  --- I am aware that the existing "norm_inner_le_norm" exists in
+  --- Mathlib.Analysis.InnerProductSpace.Basic, my aim is to formalise
+  --- the proof we did in MA3G7, which will complete our collection of all
+  --- the named theorems from Chapter 4 of that module.
+ theorem Cauchy_Scwartz{x y : E}:
+   ‖⟪x, y⟫‖ ≤ ‖x‖*‖y‖ := by
+  by_cases hy : y = 0
+  --- Case y = 0
+  rw [hy]
+  rw [inner_zero_right]
+  simp
+
+  --- Case y ≠ 0
+  let α := ⟪x, y⟫ / ‖y‖^2
+  have h_nonneg: ‖x - α • y‖^2 ≥ 0 := by
+   exact sq_nonneg ‖x - α • y‖
+  have h_exp : (‖x - α • y‖^2 : ℂ) = ‖x‖^2 - (star α) * ⟪y, x⟫ - α * ⟪x, y⟫ + ‖α‖^2 * ‖y‖^2 := by

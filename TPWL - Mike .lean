@@ -1,8 +1,3 @@
-/--
-  All contents in this file are Mike's rough work, please check the TPWLFinalProject to see how it's work.
---/
-
-
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 import Mathlib.Analysis.Normed.Module.Dual
@@ -10,74 +5,13 @@ import Mathlib.Analysis.InnerProductSpace.Orthogonal
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Data.Complex.Basic
-
 open scoped ComplexInnerProductSpace
 set_option linter.style.docString false
 set_option linter.style.longLine false
-
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
 variable (G : StrongDual ℂ E)
 
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-
-
-/-
-We prove the **polarization identity** in a complex inner product space:
-the inner product ⟪x, y⟫ can be recovered from a combination of four squared norms.
-
-This is a small but interesting lemma: it shows that, over ℂ, the norm uniquely determines
-the inner product (a fact used frequently in Hilbert space theory).
--/
-lemma Polarization_Identity_v1 (x y : E) :
-    (4 : ℂ) * ⟪x, y⟫
-      =
-      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
-        + (↑‖x - I • y‖ ^ 2 - ↑‖x + I • y‖ ^ 2) * I) := by
-  have h :=
-    (inner_eq_sum_norm_sq_div_four (E := E) (𝕜 := ℂ) (x := x) (y := y))
-  have h4 : (4 : ℂ) ≠ 0 := by norm_num
-  rw [h]
-  field_simp [h4]
-  simp
-  sorry
-
-lemma Polarization_Identity_v2 (x y : E) :
-    (4 : ℂ) * ⟪x, y⟫
-      =
-      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
-        + I * ↑‖x - I • y‖ ^ 2 - I * ↑‖x + I • y‖ ^ 2) := by
-  have hv1 := Polarization_Identity_v1 (I := I) (x := x) (y := y)
-  rw [hv1]
-  ring_nf
-
-
-/-
-In this part we prove the **parallelogram law** in a complex inner product space:
-
-  ‖x + y‖^2 + ‖x - y‖^2 = 2‖x‖^2 + 2‖y‖^2.
-
-This is a classic and useful lemma: it captures the geometry of inner product norms and
-is often used as a quick algebraic tool in Hilbert space arguments.
--/
-
-lemma Parallelogram_Law (x y : E) :
-    ((‖x + y‖ ^ 2 + ‖x - y‖ ^ 2 : ℝ) : ℂ)
-      =
-    (2 : ℂ) * (‖x‖ ^ 2 : ℂ) + (2 : ℂ) * (‖y‖ ^ 2 : ℂ) := by
-  -- Expand the two squared norms in ℝ
-  have h1 : ‖x + y‖ ^ 2 = ‖x‖ ^ 2 + 2 * (RCLike.re ⟪x, y⟫) + ‖y‖ ^ 2 := by
-    simpa using (norm_add_sq (𝕜 := ℂ) x y)
-
-  have h2 : ‖x - y‖ ^ 2 = ‖x‖ ^ 2 - 2 * (RCLike.re ⟪x, y⟫) + ‖y‖ ^ 2 := by
-    simpa using (norm_sub_sq (𝕜 := ℂ) x y)
-
-  -- Add the two equalities
-  have hR : (‖x + y‖ ^ 2 + ‖x - y‖ ^ 2 : ℝ) = 2 * ‖x‖ ^ 2 + 2 * ‖y‖ ^ 2 := by
-    linarith [h1, h2]
-
-  have hC := congrArg (fun r : ℝ => (r : ℂ)) hR
-  simpa [mul_add, add_mul, mul_assoc, mul_comm, mul_left_comm, add_assoc, add_comm, add_left_comm] using hC
-
+--All contents in this file are Mike's rough work, please check the TPWLFinalProject to see how it's work.
 
 
 
@@ -206,7 +140,7 @@ lemma Polarization_Identity_v2 (x y : E) :
       =
       (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
         + I * ↑‖x - I • y‖ ^ 2 - I * ↑‖x + I • y‖ ^ 2) := by
-  have hv1 := Polarization_Identity_v1 (x := x) (y := y)
+  have hv1 := Polarization_Identity_v1 (I := I) (x := x) (y := y)
   rw [hv1]
   ring_nf
 

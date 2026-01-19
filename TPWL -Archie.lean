@@ -131,4 +131,13 @@ theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
   let α := ⟪x, y⟫ / ‖y‖^2
   have h_nonneg: ‖x - α • y‖^2 ≥ 0 := by
    exact sq_nonneg ‖x - α • y‖
-  have h_exp : (‖x - α • y‖^2 : ℂ) = ‖x‖^2 - (star α) * ⟪y, x⟫ - α * ⟪x, y⟫ + ‖α‖^2 * ‖y‖^2 := by
+  have h_exp : (‖x - α • y‖^2) = ‖x‖^2 - (star α) • ⟪y, x⟫ - α • ⟪x, y⟫ + ‖α‖^2 • ‖y‖^2 := by
+    sorry
+  have h_final : (0 : ℝ) ≤ ‖x‖^2 - ‖⟪x, y⟫‖^2 / ‖y‖^2 := by
+    -- We use 'norm_cast' to move from Complex h_exp back to Reals
+    norm_cast at h_exp
+    sorry
+  replace h_final : ‖⟪x, y⟫‖^2 ≤ ‖x‖^2 * ‖y‖^2 := by
+    ---linarith [mul_le_mul_of_nonneg_right h_final (sq_nonneg ‖y‖)]
+   sorry
+  sorry

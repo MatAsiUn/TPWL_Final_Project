@@ -93,8 +93,27 @@ lemma elements_of_dual_space_attain_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
 
   --- We first define the canoncical embedding map:
 
-def canonical_embedding := --- how should we define do we think?
+---def canonical_embedding := --- how should we define do we think?
 
-theorem Hilbert_is_Reflexive (Φ : StrongDual ℂ (StrongDual ℂ E)) :
-  ∃ v : E, Φ = canonical_embedding v := by
-  sorry
+---theorem Hilbert_is_Reflexive (Φ : StrongDual ℂ (StrongDual ℂ E)) :
+  ---∃ v : E, Φ = canonical_embedding v := by
+ --- sorry
+
+ set_option linter.unusedSectionVars false
+
+ --- I prove some interesting results in inner product spaces:
+ --- In a section proving useful theorems on inner product spaces,
+ --- we would be remiss to not prove argubly one of the most
+ --- famous theorems in mathematics. I recreate the proof we
+ --- used in MA3G7 Functional Analysis 1
+theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
+  ‖x + y‖^2 = ‖x‖^2 + ‖y‖^2 := by
+   --- First expand the inner product
+  have h1 : ‖x + y‖ ^ 2 = ‖x‖ ^ 2 + 2 * (RCLike.re ⟪x, y⟫) + ‖y‖ ^ 2 := by
+   exact norm_add_sq x y
+  have h2 : RCLike.re (inner ℂ x y) = 0 := by --- effectively the same statment as our assumption
+    rw [h]
+    simp
+  rw [h1]
+  rw [h2]
+  simp

@@ -9,7 +9,8 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Minimal -- This module contains
 --the projection theorem. It is used to prove the theorem UandUperpCompl
-import Mathlib.Topology.Algebra.Module.LinearMap --Needed for ContinuousLinearMap.isClosed_ker
+-- import `Mathlib.Topology.Algebra.Module.LinearMap`  -- previously for `ContinuousLinearMap.isClosed_ker`
+-- Omitted: we use the local lemma `isClosed_ker_of_strongDual` instead.
 set_option linter.style.longLine false
 set_option linter.style.commandStart false
 
@@ -116,6 +117,9 @@ end inner_product_space_theorems
 
 section hilbert_space_theorems
 
+set_option linter.unusedSectionVars false
+
+
 -- We now define a module E as before, but we include the assumption that the
 -- space is complete
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
@@ -208,7 +212,20 @@ swap
     rw [inner_self_eq_zero] at uu_2inner
     exact uu_2inner
 
+-- Replacement for `ContinuousLinearMap.isClosed_ker` in the special case `G : StrongDual ℂ E`.
+-- We prove `ker(G)` is closed by rewriting it as the preimage of `{0}`
+-- under the continuous map `G`.
+lemma isClosed_ker_of_strongDual (G : StrongDual ℂ E) :
+    IsClosed (LinearMap.ker (G : E →ₗ[ℂ] ℂ) : Set E) := by
+  -- Rewrite ker as a preimage of {0} under the continuous map G
+  have hker :
+      (LinearMap.ker (G : E →ₗ[ℂ] ℂ) : Set E) =
+        (fun x : E => G x) ⁻¹' ({0} : Set ℂ) := by
+    ext x
+    simp  -- uses: x ∈ ker ↔ G x = 0, and membership in preimage/singleton
 
+  -- Preimage of a closed set under a continuous map is closed
+  simpa [hker] using (isClosed_singleton.preimage G.continuous)
 
 
 lemma mem_kernel_of_orthogonal_sub
@@ -224,8 +241,10 @@ lemma mem_kernel_of_orthogonal_sub
 
   let K := LinearMap.ker G
 
-  -- [Assumption]: Double Orthogonal Complement for closed subspaces.
-  have hK_closed : IsClosed (K : Set E) := ContinuousLinearMap.isClosed_ker G
+  have hK_closed : IsClosed (K : Set E) := by
+    -- Using lemma `isClosed_ker_of_strongDual` instead of imported module
+    simpa [K] using (isClosed_ker_of_strongDual (E := E) G)
+
   have h_double_perp : K = Kᗮᗮ := by
     exact (PerpIsPerp K hK_closed).symm
 
@@ -298,8 +317,9 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     -- By definition we automatically get that LinearMap.ker G is a submodule
     -- So we must only prove that it is closed to be able to use the
     -- isomorphism in Functional_Coker_Dim
-    have KerGClosed: IsClosed (LinearMap.ker G : Set E) :=
-    by exact ContinuousLinearMap.isClosed_ker G
+    have KerGClosed: IsClosed (LinearMap.ker G : Set E) := by
+      -- Using lemma `isClosed_ker_of_strongDual` instead of imported module
+      simpa using (isClosed_ker_of_strongDual (E := E) G)
     have hG_lin : (G : E →ₗ[ℂ] ℂ) ≠ 0 := by norm_cast --this step is necessary
     -- since our proof hCoker_Rank required the hypothesis that G was a linear map
     -- but we had that G was a continuous linear map (as all members of strong dual
@@ -369,8 +389,6 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
   -- [Technical]: Unifies Scalar Multiplication (•) with Standard Multiplication (*) in ℂ
     rw [smul_eq_mul]
  }
-
-set_option linter.unusedSectionVars false
 
 /--
 Uniqueness: if the same continuous linear functional G is represented by v1 and v2,

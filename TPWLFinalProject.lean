@@ -9,8 +9,6 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection.Minimal -- This module contains
 --the projection theorem. It is used to prove the theorem UandUperpCompl
--- import `Mathlib.Topology.Algebra.Module.LinearMap`  -- previously for `ContinuousLinearMap.isClosed_ker`
--- Omitted: we use the local lemma `isClosed_ker_of_strongDual` instead.
 set_option linter.style.longLine false
 set_option linter.style.commandStart false
 

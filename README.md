@@ -17,7 +17,8 @@ Summary of everyone's contributions:
 - Mateo:
 Set up the Github repository, completed the first parts of the existence proof (the parts before Mike's section). Proved the Functional_Coker_Dim lemma, the exists_unit_vector_of_finrank_one lemma, proved the UandUperpCompl lemma, proved the PerpIsPerp lemma, proved the Quotient_Iso_Perp lemma.
 
-- Thomas
+- Thomas:
+Completed the uniqueness part of the Riesz Representatin Theorem (Outline steps 8-9) and also proved the "isClosed_ker_of_strongDual lemma", which replaces the imported lemma "ContinuousLinearMap.isClosed_ker" from "Mathlib.Topology.Algebra.Module.LinearMap"
 
 - Mike:
 

@@ -143,7 +143,7 @@ theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
    sorry
   sorry
 
-  lemma Polarization_Identity_v1(x y : E) :
+  lemma Polarization_Identity_Complex(x y : E) :
     (4 : ℂ) * ⟪x, y⟫
       =
       (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
@@ -160,3 +160,4 @@ lemma Polarization_Identity_v2{I: ℂ} (x y : E) :
   have hv1 := Polarization_Identity_v1 (I := I) (x := x) (y := y)
   rw [hv1]
   ring_nf
+  sorry

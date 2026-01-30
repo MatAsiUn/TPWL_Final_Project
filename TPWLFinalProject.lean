@@ -122,7 +122,30 @@ lemma Parallelogram_Law (x y : E) :
   have hC := congrArg (fun r : ℝ => (r : ℂ)) hR
   simpa [mul_add, add_mul, mul_assoc, mul_comm, mul_left_comm, add_assoc, add_comm, add_left_comm] using hC
 
+lemma Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
+   ‖x + y‖^2 = ‖x‖^2 + ‖y‖^2 := by
+   --- First expand the inner product
+  have h_exp : ‖x + y‖ ^ 2 = ‖x‖ ^ 2 + 2 * (RCLike.re ⟪x, y⟫) + ‖y‖ ^ 2 := by
+   exact norm_add_sq x y
+   --- The real part of the inner product is also 0
+  have h_zer : RCLike.re (⟪x, y⟫) = 0 := by
+    rw [h]
+    simp
+  --- Combine the two
+  rw [h_exp]
+  rw [h_zer]
+  simp
 
+---ADD COMMENTS
+lemma Polarization_Identity_Complex(x y : E) :
+    (4 : ℂ) * ⟪x, y⟫
+      =
+      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
+        + (↑‖x - Complex.I • y‖ ^ 2 - ↑‖x + Complex.I • y‖ ^ 2) * Complex.I) := by
+  --- We leverage an existing version of the polarisation identity
+  rw[inner_eq_sum_norm_sq_div_four x y]
+  simp only [Complex.coe_algebraMap, RCLike.I_to_complex]
+  ring_nf
 
 end inner_product_space_theorems
 
@@ -444,7 +467,7 @@ theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
 
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
-----This concludes the existence and uniqueness proofs of Riesz Representation Theorem----
+-------------------------------- Section 5: Corrollaries ---------------------------------
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 -- We now prove an interesting corrollary of Riesz, that states that for any non-trivial G,

@@ -126,6 +126,7 @@ theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
   rw [hy]
   rw [inner_zero_right]
   simp
+  sorry
 
   --- Case y ≠ 0
   let α := ⟪x, y⟫ / ‖y‖^2
@@ -141,3 +142,21 @@ theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
     ---linarith [mul_le_mul_of_nonneg_right h_final (sq_nonneg ‖y‖)]
    sorry
   sorry
+
+  lemma Polarization_Identity_v1(x y : E) :
+    (4 : ℂ) * ⟪x, y⟫
+      =
+      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
+        + (↑‖x - Complex.I • y‖ ^ 2 - ↑‖x + Complex.I • y‖ ^ 2) * Complex.I) := by
+  rw[inner_eq_sum_norm_sq_div_four x y]
+  simp only [Complex.coe_algebraMap, RCLike.I_to_complex]
+  ring_nf
+
+lemma Polarization_Identity_v2{I: ℂ} (x y : E) :
+    (4 : ℂ) * ⟪x, y⟫
+      =
+      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
+        + I * ↑‖x - I • y‖ ^ 2 - I * ↑‖x + I • y‖ ^ 2) := by
+  have hv1 := Polarization_Identity_v1 (I := I) (x := x) (y := y)
+  rw [hv1]
+  ring_nf

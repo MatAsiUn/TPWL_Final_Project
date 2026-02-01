@@ -13,6 +13,7 @@ We are happy for the group to be given a joint mark for the project (we do not w
 Summary of everyone's contributions:
 
 - Archie
+Completed the setup of Riesz Representation theorem (Outline 1-3). Proved Pythagorus Theorem and completed the proof for the polarization identity (Mike wrote the statement, I wrote the proof). Proved a corrollary of Riesz that states that elements of the dual space attain their norms.
 
 - Mateo:
 Set up the Github repository, completed the first parts of the existence proof (the parts before Mike's section). Proved the Functional_Coker_Dim lemma, the exists_unit_vector_of_finrank_one lemma, proved the UandUperpCompl lemma, proved the PerpIsPerp lemma, proved the Quotient_Iso_Perp lemma.

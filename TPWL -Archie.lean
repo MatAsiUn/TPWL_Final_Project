@@ -1,14 +1,11 @@
 import TPWLFinalProject.Basic
 import Mathlib.Tactic.Basic
 import Mathlib.Analysis.InnerProductSpace.Defs
---import Mathlib.LinearAlgebra.Span.Basic
---import Mathlib.LinearAlgebra.FiniteDimensional.Defs
---import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
---import Mathlib.Analysis.Normed.Module.Basic
---import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.InnerProductSpace.Adjoint
+import Mathlib.Data.List.TFAE
+import Mathlib.Analysis.Complex.Basic
 
 set_option linter.style.commandStart false
 
@@ -97,8 +94,8 @@ lemma elements_of_dual_space_attain_norm (G : StrongDual ℂ E)(hG : G ≠ 0):
  --- I prove some interesting results in inner product spaces:
  --- In a section proving useful theorems on inner product spaces,
  --- we would be remiss to not prove argubly one of the most
- --- famous theorems in mathematics. I recreate the proof we
- --- used in MA3G7 Functional Analysis 1
+ --- famous theorems in mathematics. I recreate the proofs from
+ --- MA3G7 Functional Analysis 1
 theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
    ‖x + y‖^2 = ‖x‖^2 + ‖y‖^2 := by
    --- First expand the inner product
@@ -113,6 +110,16 @@ theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
   rw [h_zer]
   simp
 
+lemma Polarization_Identity_Complex(x y : E) :
+    (4 : ℂ) * ⟪x, y⟫
+      =
+      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
+        + (↑‖x - Complex.I • y‖ ^ 2 - ↑‖x + Complex.I • y‖ ^ 2) * Complex.I) := by
+  rw[inner_eq_sum_norm_sq_div_four x y]
+  simp only [Complex.coe_algebraMap, RCLike.I_to_complex]
+  ring_nf
+
+  /-
   --- We now prove the Cauchy-Schwartz inequality, another very important
   --- theorem for inner product spaces
   --- I am aware that the existing "norm_inner_le_norm" exists in
@@ -143,21 +150,25 @@ theorem Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
    sorry
   sorry
 
-  lemma Polarization_Identity_Complex(x y : E) :
-    (4 : ℂ) * ⟪x, y⟫
-      =
-      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
-        + (↑‖x - Complex.I • y‖ ^ 2 - ↑‖x + Complex.I • y‖ ^ 2) * Complex.I) := by
-  rw[inner_eq_sum_norm_sq_div_four x y]
-  simp only [Complex.coe_algebraMap, RCLike.I_to_complex]
-  ring_nf
 
-lemma Polarization_Identity_v2{I: ℂ} (x y : E) :
-    (4 : ℂ) * ⟪x, y⟫
-      =
-      (↑‖x + y‖ ^ 2 - ↑‖x - y‖ ^ 2
-        + I * ↑‖x - I • y‖ ^ 2 - I * ↑‖x + I • y‖ ^ 2) := by
-  have hv1 := Polarization_Identity_v1 (I := I) (x := x) (y := y)
-  rw [hv1]
-  ring_nf
+
+--- Interesting lemma from FA1
+lemma orthogonality_equivalence (x y : E) :
+  List.TFAE [
+  ⟪x, y⟫ = 0,
+  ∀ α : ℂ, ‖x + α • y‖ =  ‖x - α • y‖,
+  ∀ α : ℂ, ‖x‖ ≤ ‖x + α • y‖
+  ] := by
+  tfae_have 1 → 2 := by
+    intro h α
+    have hplus: ‖x + α • y‖^2 = ‖x‖^2 + ‖α‖^2 * ‖y^2‖ := by
+      rw[norm_add_sq, nor     m_sub_sq]
+
+    --have hplus: ‖x + α • y‖^2 = ‖x‖^2 + ‖α‖^2 • ‖y‖^2 := by
+      --sorry
+    --have hminus: ‖x - α • y‖^2 = ‖x‖^2 + ‖α‖^2 • ‖y‖^2 := by
+     -- sorry
+
+
   sorry
+-/

@@ -16,7 +16,7 @@ Summary of everyone's contributions:
 Completed the setup of Riesz Representation theorem (Outline 1-3). Proved Pythagorus Theorem and completed the proof for the polarization identity (Mike wrote the statement, I wrote the proof). Proved a corrollary of Riesz that states that elements of the dual space attain their norms.
 
 - Mateo:
-Set up the Github repository, completed the first parts of the existence proof (the parts before Mike's section). Proved the Functional_Coker_Dim lemma, the exists_unit_vector_of_finrank_one lemma, proved the UandUperpCompl lemma, proved the PerpIsPerp lemma, proved the Quotient_Iso_Perp lemma.
+Set up the Github repository, completed the first parts of the existence proof (the parts before Mike's section). Proved the Functional_Coker_Dim lemma, proved the exists_unit_vector_of_finrank_one lemma, proved the UandUperpCompl lemma, proved the PerpIsPerp lemma and proved the Quotient_Iso_Perp lemma.
 
 - Thomas:
 Completed the uniqueness part of the Riesz Representatin Theorem (Outline steps 8-9) and also proved the "isClosed_ker_of_strongDual lemma", which replaces the imported lemma "ContinuousLinearMap.isClosed_ker" from "Mathlib.Topology.Algebra.Module.LinearMap"

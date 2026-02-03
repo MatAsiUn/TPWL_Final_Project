@@ -1,4 +1,3 @@
-import TPWLFinalProject.Basic
 import Mathlib.Tactic.Basic
 import Mathlib.Analysis.InnerProductSpace.Defs
 import Mathlib.Analysis.InnerProductSpace.Basic

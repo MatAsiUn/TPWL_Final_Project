@@ -1,4 +1,3 @@
-import TPWLFinalProject.Basic
 import Mathlib.Tactic.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
@@ -16,21 +15,10 @@ import Mathlib.Topology.Algebra.Module.LinearMap --Needed for ContinuousLinearMa
 set_option linter.style.longLine false
 set_option linter.style.commandStart false
 
-
---Useful Theorems:
---Module.finBasisOfFinrankEq (generates a basis from a module of finite rank)
---Module.finite_of_finrank_eq_succ (Tells us that modules of natural number
---rank are finite dimensional)
-
 set_option linter.style.commandStart false
 
 --Defining a Vector space V
 variable {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
-
-
---The dimension of a vector space is given using the function Module.finrank
---An extremely useful theorem is hidden at Module.finBasisOfFinrankEq
---There is also an arguably more useful theorem below it
 
 
 -- This theorem in plain english, given a 1 dimensional vector space, there
@@ -235,15 +223,7 @@ theorem Riesz_Representation_Theorem_Existence(G: StrongDual ℂ E):
     sorry
  }
 
- theorem Riesz_Representation_Theorem(G: StrongDual ℂ E):
- ∃! v : E, ∀ x : E, G x = ⟪v,x⟫ := by
- sorry
- --We first start with the trivial case (where G is the zero element in the dual)
-
--- refine ExistsUnique.intro ?_ ?_ ?_
-
 open scoped ComplexInnerProductSpace
--- This is active for our entire file
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 
 -- A lemma which states that we can extract a unit vector from a unidimensional module

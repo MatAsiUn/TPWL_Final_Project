@@ -120,43 +120,54 @@ lemma Polarization_Identity_Complex(x y : E) :
 
 lemma Ptolemy_Inequality{x y z: E}(hx: x ≠ 0)(hy: y ≠ 0)(hz: z ≠ 0) :
    ‖x - y‖*‖z‖ ≤ ‖x - z‖*‖y‖ + ‖z - y‖*‖x‖  := by
-   --- Now define the vectors used to apply to triangle inequality
+   -- Now define the vectors used to apply to triangle inequality
    let x' := (‖x‖ ^ 2)⁻¹ • x
    let y' := (‖y‖ ^ 2)⁻¹ • y
    let z' := (‖z‖ ^2)⁻¹ • z
-   --- Note the use of two powers to deal with typing in lean, a⁻¹ computes
-   --- the inverse of a so is type dependant, \^-2 does not exist and the ^ ()
-   --- function expects type ℕ.
+   -- Note the use of two powers to deal with typing in lean, a⁻¹ computes
+   -- the inverse of a so is type dependant, \^-2 does not exist and the ^ ()
+   -- function expects type ℕ.
+
+   -- We now prove an identity that does a lot of the heavy lifting in this proof
    have identity : ∀ (u v : E), u ≠ 0 → v ≠ 0 →
     let u' := (‖u‖ ^ 2)⁻¹ • u
     let v' := (‖v‖ ^ 2)⁻¹ • v
     ‖u' - v'‖ = ‖u - v‖ / (‖u‖ * ‖v‖) := by
     intros u v hu hv u' v'
     have h_sq : ‖u' - v'‖^2 = (‖u - v‖ / (‖u‖ * ‖v‖))^2 := by
+
+     -- Expand LHS and simplify
      rw[div_pow, mul_pow]
      have h_exp : ‖u' - v'‖^2 = ‖u'‖^2 - 2 * (RCLike.re ⟪u', v'⟫) + ‖v'‖^2 := by
       exact norm_sub_pow_two u' v'
      rw[h_exp]
      dsimp[u', v']
+
+     -- Pull out scalars and invoke norm properties
      rw[norm_smul, norm_smul, inner_smul_left_eq_smul, inner_smul_right_eq_smul]
      simp only [norm_inv, norm_pow, norm_norm]
+
+     -- Simplifying some of the inverses
      have h_u_term : ((‖u‖ ^ 2)⁻¹ * ‖u‖)^2 = (‖u‖^2)⁻¹ := by
       field_simp [norm_ne_zero_iff.mpr hu]
      have h_v_term : ((‖v‖^2)⁻¹ * ‖v‖)^2 = (‖v‖^2)⁻¹ := by
       field_simp [norm_ne_zero_iff.mpr hv]
      rw[h_u_term, h_v_term]
-     rw[RCLike.real_smul_eq_coe_mul]
-     rw[RCLike.real_smul_eq_coe_mul]
+
+     -- Expand the RHS
      have h_exp_2 : ‖u - v‖^2 = ‖u‖^2 - 2 * (RCLike.re ⟪u, v⟫) + ‖v‖^2 := by
       exact norm_sub_pow_two u v
      rw[h_exp_2]
-     field_simp
-     ring_nf
-     sorry
+
+     -- Simplify the LHS to match the RHS
+     simp only [RCLike.re_to_complex]
+     rw[Complex.smul_re, Complex.smul_re]
+     simp only [smul_eq_mul]
+     field
 
     refine (sq_eq_sq₀ (norm_nonneg _) ?_).mp h_sq
     positivity
-    --have h_sq : ‖u' - v'‖ ^ 2 = ‖u - v‖ ^ 2 / (‖u‖ ^ 2 * ‖v‖ ^ 2) := by
+
    have hxy := identity x y hx hy
    have hzx := identity x z hx hz
    have hyz := identity z y hz hy
@@ -164,8 +175,10 @@ lemma Ptolemy_Inequality{x y z: E}(hx: x ≠ 0)(hy: y ≠ 0)(hz: z ≠ 0) :
    have tri_ineq: ‖x' - y'‖ ≤ ‖x' - z'‖ + ‖z' - y'‖ := by
     exact norm_sub_le_norm_sub_add_norm_sub x' z' y'
 
+   -- Substitute the triangle inequality to our new identity
    rw[hxy, hyz, hzx] at tri_ineq
 
+   -- The term we will multiply through by
    have h_pos : 0 < ‖x‖*‖y‖*‖z‖  := by
     positivity
 
@@ -176,7 +189,7 @@ lemma Ptolemy_Inequality{x y z: E}(hx: x ≠ 0)(hy: y ≠ 0)(hz: z ≠ 0) :
 
 
 
-  /-
+  /- NOT USED
   --- We now prove the Cauchy-Schwartz inequality, another very important
   --- theorem for inner product spaces
   --- I am aware that the existing "norm_inner_le_norm" exists in

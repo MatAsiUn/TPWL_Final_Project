@@ -135,7 +135,7 @@ lemma Pythagoras_Theorem{x y: E}(h: ⟪x, y⟫ = 0):
   rw [h_zer]
   simp
 
----ADD COMMENTS
+--- We prove the polarization identity
 lemma Polarization_Identity_Complex(x y : E) :
     (4 : ℂ) * ⟪x, y⟫
       =
@@ -145,6 +145,75 @@ lemma Polarization_Identity_Complex(x y : E) :
   rw[inner_eq_sum_norm_sq_div_four x y]
   simp only [Complex.coe_algebraMap, RCLike.I_to_complex]
   ring_nf
+
+--- We prove an interesting extension of the triangle inequality in inner product spaces
+lemma Ptolemy_Inequality{x y z: E}(hx: x ≠ 0)(hy: y ≠ 0)(hz: z ≠ 0) :
+   ‖x - y‖*‖z‖ ≤ ‖x - z‖*‖y‖ + ‖z - y‖*‖x‖  := by
+   -- Now define the vectors used to apply to triangle inequality
+   let x' := (‖x‖ ^ 2)⁻¹ • x
+   let y' := (‖y‖ ^ 2)⁻¹ • y
+   let z' := (‖z‖ ^2)⁻¹ • z
+   -- Note the use of two powers to deal with typing in lean, a⁻¹ computes
+   -- the inverse of a so is type dependant, \^-2 does not exist and the ^ ()
+   -- function expects type ℕ.
+
+   -- We now prove an identity that does a lot of the heavy lifting in this proof
+   have identity : ∀ (u v : E), u ≠ 0 → v ≠ 0 →
+    let u' := (‖u‖ ^ 2)⁻¹ • u
+    let v' := (‖v‖ ^ 2)⁻¹ • v
+    ‖u' - v'‖ = ‖u - v‖ / (‖u‖ * ‖v‖) := by
+    intros u v hu hv u' v'
+    have h_sq : ‖u' - v'‖^2 = (‖u - v‖ / (‖u‖ * ‖v‖))^2 := by
+
+     -- Expand LHS and simplify
+     rw[div_pow, mul_pow]
+     have h_exp : ‖u' - v'‖^2 = ‖u'‖^2 - 2 * (RCLike.re ⟪u', v'⟫) + ‖v'‖^2 := by
+      exact norm_sub_pow_two u' v'
+     rw[h_exp]
+     dsimp[u', v']
+
+     -- Pull out scalars and invoke norm properties
+     rw[norm_smul, norm_smul, inner_smul_left_eq_smul, inner_smul_right_eq_smul]
+     simp only [norm_inv, norm_pow, norm_norm]
+
+     -- Simplifying some of the inverses
+     have h_u_term : ((‖u‖ ^ 2)⁻¹ * ‖u‖)^2 = (‖u‖^2)⁻¹ := by
+      field_simp [norm_ne_zero_iff.mpr hu]
+     have h_v_term : ((‖v‖^2)⁻¹ * ‖v‖)^2 = (‖v‖^2)⁻¹ := by
+      field_simp [norm_ne_zero_iff.mpr hv]
+     rw[h_u_term, h_v_term]
+
+     -- Expand the RHS
+     have h_exp_2 : ‖u - v‖^2 = ‖u‖^2 - 2 * (RCLike.re ⟪u, v⟫) + ‖v‖^2 := by
+      exact norm_sub_pow_two u v
+     rw[h_exp_2]
+
+     -- Simplify the LHS to match the RHS
+     simp only [RCLike.re_to_complex]
+     rw[Complex.smul_re, Complex.smul_re]
+     simp only [smul_eq_mul]
+     field
+
+    refine (sq_eq_sq₀ (norm_nonneg _) ?_).mp h_sq
+    positivity
+
+   have hxy := identity x y hx hy
+   have hzx := identity x z hx hz
+   have hyz := identity z y hz hy
+
+   have tri_ineq: ‖x' - y'‖ ≤ ‖x' - z'‖ + ‖z' - y'‖ := by
+    exact norm_sub_le_norm_sub_add_norm_sub x' z' y'
+
+   -- Substitute the triangle inequality to our new identity
+   rw[hxy, hyz, hzx] at tri_ineq
+
+   -- The term we will multiply through by
+   have h_pos : 0 < ‖x‖*‖y‖*‖z‖  := by
+    positivity
+
+   rw[← mul_le_mul_iff_left₀ h_pos] at tri_ineq
+   field_simp at tri_ineq
+   linarith[tri_ineq]
 
 end inner_product_space_theorems
 
